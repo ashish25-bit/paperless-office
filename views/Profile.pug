@@ -1,0 +1,16 @@
+block content
+    include lay_head
+
+    p= person[0].Name
+    p= person[0].Email
+    p= person[0].Company
+    p= person[0].Position
+    p Connections :  
+        span= person[0].connections
+    img(src="uploads/" + img width='200px')
+    div
+        a(href="/profile=" + person[0].id class="profile_id")= 'localhost:3000/profile=' + person[0].id
+    button(class='connect_btn') Connect
+
+    script
+        include includes/someProfile.js

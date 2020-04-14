@@ -1,0 +1,27 @@
+block content
+    include lay_head
+
+    .profile_info_con
+        .profile_info
+            .profile_name_image
+                p= user.Name
+                .profile_profile_image
+                    img(width='220px' class="profile_photo profile_pic_display")
+            p Company : 
+                span.c= user.Company
+            p Position : 
+                span.p= user.Position
+            p Offcial Email : 
+                span= user.Email
+            p Connections : 
+                span= user.connections
+            
+            .profile_signature_con
+                p Signature :
+                img(src="signature/" + user.Sign width='150px' style="pointer-events:none;")
+
+            .update_link_con
+                a(href="/update_profile") Update Profile
+    script
+        include includes/profile.js
+        

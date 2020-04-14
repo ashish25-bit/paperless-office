@@ -1,0 +1,34 @@
+block content
+    include lay_head
+
+    .chats_con
+        .chat_names
+            button(class="menu_chat_btn") M
+            .menu_options
+                p.create_group_chat.menu_option Create Group
+            p.po_chats PaperLess Office
+            .btn_chats_groups
+                button(class="msg_con_display") Messages
+                button(class="chats_con_display") People
+                button(class="group_con_display") Groups
+            p.pop_up_msg
+            .container_msg_chats
+                .message this is message container
+                .chats
+                .groups
+            .group_select 
+        .messages
+            .group_info
+                p.g_name
+                .docs_media_con
+                    .docs_media_button_con
+                        button(class='show_members') Members
+                        button(class='show_docs') Documents
+                        button(class='show_media') Media
+                        .add_mem_con
+                            button(class='add_mem_btn') Add Member
+                    .docs_media  
+        
+    script(src="/socket.io/socket.io.js")
+    script
+        include includes/chat.js

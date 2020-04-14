@@ -1,0 +1,7 @@
+extends layout
+block content
+    .setup_con
+        .logout_con
+            a(href='/logout') Logout
+        h1(class="username_temp")= name
+        include includes/setup-form

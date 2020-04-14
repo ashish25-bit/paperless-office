@@ -1,0 +1,21 @@
+extends layout
+block content
+    .container
+        .wrapper
+            p(class="po") PaperLess Office
+            
+            .form_con
+                .login_form
+                    include includes/login-form
+                .signup_form 
+                    include includes/register-form
+                p.error= error
+
+            .option_con
+                .login_option.active_option
+                    p Login
+                .signup_option
+                    p Signup
+
+    script
+        include includes/login-signup.js

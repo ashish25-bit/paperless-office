@@ -1,0 +1,13 @@
+extends layout
+block content
+    
+    .setup_con
+        .logout_con
+            a(href='/logout') Logout
+        h1(class="username_temp")= name
+
+        .remove_bg_con
+            include includes/remove_form
+
+    script
+        include includes/remove_js.js

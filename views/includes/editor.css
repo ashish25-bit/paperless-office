@@ -1,0 +1,179 @@
+*{
+    margin:0;
+    padding:0;
+}
+body,input,.input[type=submit],button{
+    font-family: 'Poppins', sans-serif;
+}
+a{
+    text-decoration: none;
+}
+input[type=submit],button,input[type=button]{
+    cursor: pointer;
+}
+.head{
+    background: #4CBB86;
+    display: flex;
+    overflow: hidden;
+}
+.link_po,.nav_link_con,.img_profile_con{
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    flex: 1;
+}
+.link_po p a{
+    letter-spacing: 1.5px;
+    color:black;
+}
+.nav_link_con ul{
+    list-style: none;
+}
+.head_link{
+    display: inline-block;
+    margin: 0 10px;
+    padding: 15px 6px;
+    position: relative;
+}
+.head_link a{
+    color: white;
+    font-size: 17px;
+    letter-spacing: 1.3px;
+}
+.head_link::before{
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 5px;
+    background: #179498;
+    bottom: -10px;
+    left: 0;
+    transition: 0.3s bottom ease;
+}
+.head_link:hover::before{
+    bottom: 0;
+}
+.profile_con{
+    border-radius: 50%;
+    overflow: hidden;
+    height: 40px;
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    margin: 0 9px;
+}
+.logout_con{
+    text-align: right;
+    padding: 20px;
+    background: #4CBB86;
+}
+.logout_con a,.logout{
+    background: #36827d;
+    text-transform: uppercase;
+    padding: 6px;
+    margin-right: 50px;
+    color: white;
+}
+.logout{
+    margin-left: 10px;
+}
+.username_temp{
+    margin: 20px;
+    color: white;
+}
+
+.doc_content{
+    margin: 0 auto;
+    width: 80%;
+    height: 80vh;
+    overflow-y: auto;
+    border: 1px #ddd solid;
+    padding: 20px;
+}
+
+.share_add_btn_con{
+    margin: 10px 0;
+    text-align: center;
+}
+
+.share_add_btn_con input{
+    margin: 0 5px;
+    padding: 5px 8px;
+    border: none;
+    color: white;
+    font-weight: 700;
+    background: #36827D;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+    outline: none;
+}
+
+.share_add_btn_con input:hover{
+    background: #20504d;
+}
+
+.signed_img{
+    pointer-events: none;
+    width: 200px;
+}
+.pwd_con_sign{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0,0,0,.5);
+}
+.pwd_con_sign div{
+    position: absolute;
+    top:40%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 400px;
+    background: #235D42;
+    text-align: center;
+    padding: 20px;
+    border-radius: 60px;
+    box-shadow: 3px 3px 3px rgba(0,0,0,.4), -1px -1px 3px white;
+}
+.sign_pwd{
+    width: 80%;
+    margin: 10px 0;
+    padding: 6px;
+    border:1px #ccc solid;
+    border-radius: 50px;
+    outline: none;
+}
+.cancel_sign,.fetch_sign{
+    margin: 10px 5px;
+    padding: 6px;
+    border-radius: 50px;
+    border: none;
+    color:white;
+    background: #179498;
+    outline: none;
+    letter-spacing: 1.4px;
+}
+.doc_content::-webkit-scrollbar {
+    width: 5px;
+}
+.doc_content::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+}
+   
+  /* Handle */
+.doc_content::-webkit-scrollbar-thumb {
+    background: #888; 
+}
+  
+  /* Handle on hover */
+.doc_content:-webkit-scrollbar-thumb:hover {
+    background: #555; 
+}
+.wrong_pwd{
+    text-align: center;
+    color: red;
+}

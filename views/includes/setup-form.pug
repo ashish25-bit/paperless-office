@@ -1,0 +1,20 @@
+div.container_setup
+    form(method="POST" class="setup_form" enctype='multipart/form-data')
+        .profile_setup_img_con
+            div
+                input(class="image_input" name="profile_image" type="file" id="image_input")
+                label(for="image_input" class="label_image_profile") Select Image
+
+            div
+                img(class="preview" width='200px' src="/uploads/download.png")
+        .inp_con
+            div
+                input(class="comp key" type="text" name="company" placeholder="Enter the company you currently work in" autocomplete="off" value = user.Company)
+            div
+                input(class="pos" type="text" name="position" placeholder="Enter your position in your company")    
+            input(class="upload" type="submit" value="Submit")
+.companies
+    
+script 
+    include auto.js
+    include setup_js.js

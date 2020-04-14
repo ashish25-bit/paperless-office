@@ -1,0 +1,55 @@
+extends layout
+block content
+    include lay_head
+
+    .update_con
+        .update_options_list
+
+            .update_profile_photo.option_update.active_option_update
+                p Change Profile Photo
+
+            .update_password.option_update
+                p Change Password
+
+            .update_details.option_update
+                p Change Details
+
+            .update_signature.option_update    
+                p Change Signature 
+
+        .update_option_con
+
+            // Container for Updating profile photo
+            .update_profile_photo_con.update
+                img(width='200px')
+
+            // Container for Updating password
+            .update_password_con.update
+                div 
+                    input(type="password" class="update_pwd" placeholder="Enter Current Password")
+                div
+                    input(type="password" class="update_pwd new_pwd" placeholder="Enter New Password")
+                div
+                    input(type="password" class="update_pwd confirm_new_pwd" placeholder="Confirm Password")
+                input(type="button", value="Confirm" class="upload update_pwd_btn")
+                p(class="pwd_update_msg")
+
+            // Container for Updating details
+            .update_details_con.update
+                div
+                    input(type="text" class="comp key" name="comp" placeholder='Enter the company you currently work in')
+                div
+                    input(type='text' class="pos" name='pos' placeholder='Enter your position in your company')
+                input(type="button", value="Update" class='upload update_det')
+                p(class="det_update_msg")
+            .companies_update
+
+            // Container for Updating Signature
+            .update_signature_con.update
+                div(style="text-align:center;")
+                    img(src='signature/' + user.Sign width='250px' style="pointer-events:none;")
+
+    script
+        include includes/update_profile.js
+
+        

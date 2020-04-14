@@ -1,0 +1,21 @@
+.link_po
+    p 
+        a(href="/home") PaperLess Office
+
+div.nav_link_con
+    ul
+        block links
+        li.head_link
+            a(href='/home') Home
+        li.head_link
+            a(href="/profile") Profile
+        li.head_link
+            a(href="/chat") Chat Room
+        li.head_link
+            a(href='/docs') Documents
+
+div.img_profile_con
+    div.profile_con
+        img(width="60px" class="profile_photo")
+    span=user.Name
+    a(href='/logout' class="logout") Logout
