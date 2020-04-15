@@ -4,6 +4,9 @@
 
 3. When the user is logged in the connect button is showing that the 'Connect' option even if it is already 'Conneceted'. The page is needed to be refreshed to get the correct state. You have to use Joining of ths database.
 
+4. At some place to get to a profile of a person it is -> /profile:id or /profile=id 
+   suggestion: 
+   make the url as /profile/name/id or /profile/id
 
 // chat app
 1. As soon as the user opens the chat a chat room will be formed. 

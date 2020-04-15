@@ -1,6 +1,5 @@
 block content
     include lay_head
-
     .chats_con
         .chat_names
             button(class="menu_chat_btn") M
@@ -28,6 +27,13 @@ block content
                         .add_mem_con
                             button(class='add_mem_btn') Add Member
                     .docs_media  
+
+        .add_member_names_con
+            .new_members_names
+            .extra_add_mem_con
+                button(class='cancel_add_mem') Cancel
+                button(class='add_members') Add
+            span.empty_selections Please Select aleast one receipent
         
     script(src="/socket.io/socket.io.js")
     script

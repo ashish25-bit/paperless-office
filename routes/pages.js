@@ -371,9 +371,7 @@ router.get('/profile:id' , (req,res,next) => {
 router.post('/connect' , (req,res,next) => {
     shepard = req.session.user.id
     master = req.body.master
-    user.connect(shepard, master, function(result) {
-        result ? res.send('connected') : res.send('There was an error connecting')
-    })
+    user.connect(shepard, master, (result) => result ? res.send('connected') : res.send('There was an error connecting') )
 })
 
 // request for getting all connections
@@ -474,9 +472,7 @@ router.get('/conn_status' , (req,res,next) => {
 router.get('/get_groups' , (req,res,next) => {
     if(req.session.user){
         id = req.session.user.id
-        user.get_groups(id, (result) => {
-            res.send(result)
-        })
+        user.get_groups(id, (result) => res.send(result) )
     }
 })
 
@@ -565,6 +561,11 @@ router.post('/make_admin', (req,res,next) => {
     gid = req.body.gid
     mid = req.body.mid
     user.makeAdmin(gid,mid, (result) => res.send(result))
+})
+
+// request for adding the members
+router.post('/add_members' , (req,res,next) => {
+    user.add_members(req.body , result => res.send(result))
 })
 
 module.exports = router

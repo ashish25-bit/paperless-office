@@ -144,11 +144,13 @@ User.prototype = {
     },
     
     connect : function(shepard, master, callback) {
+        room = shepard > master ? `${master}+${shepard}` : `${shepard}+${master}`
         ids = []
         ids.push(shepard)
         ids.push(master)
+        ids.push(room)
         
-        let query = 'INSERT INTO connections (shepard, master) VALUES (? , ?)'
+        let query = 'INSERT INTO connections (shepard, master, room) VALUES (?, ?, ?)'
         db.query(query, ids, (err,result) => {
             if(err) throw err
 
@@ -264,7 +266,6 @@ User.prototype = {
                     db.query(query,member, (e,r) => {
                         if(e) throw e
                     })
-
                 })
             }
             callback(res)
@@ -330,7 +331,7 @@ User.prototype = {
     },
 
     // to confirm the password of the document
-    confirm_doc_pas : (pwd,id, callback) => {        
+    confirm_doc_pas : (pwd,id, callback) => {
         let query = 'SELECT Password FROM documents WHERE id = ?'
         db.query(query,id, (err,result) => {
             if(err) throw err
@@ -360,7 +361,26 @@ User.prototype = {
             if(err) callback('Error in making admin')
             callback(`${mid} has been made the admin`)
         })
-    }
+    },
+
+    // add members to a group
+    add_members : (body, callback) => {
+        members = body.members.split(',')
+        time = moment().format('MMMM Do YYYY, h:mm:ss A')
+        members.forEach(id => {
+            info = []
+            type = 'member'
+            info.push(parseInt(body.gid))
+            info.push(parseInt(id))
+            info.push(type)
+            info.push(time)            
+            let query = 'INSERT INTO groupmembers (groupid,memberid,type,Timestamp) VALUES (?,?,?,?)'
+            db.query(query,info, (err,res) => console.log(err ? err : res) )
+        })
+        callback(true)    
+    },
+
+    
 }
 
 module.exports = User

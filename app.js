@@ -4,9 +4,10 @@ const session = require('express-session')
 const pageRouter = require('./routes/pages')
 const socketio = require('socket.io') 
 const http = require('http')
-const {findRoom,makeRoom} = require('./utils/room')
-const {joinUser,findUser,removeUser} = require('./utils/users')
+const {joinUser,removeUser} = require('./utils/users')
+const User = require('./core/user') 
 
+const uu = new User()
 const app = express()
 const server = http.createServer(app)
 const io = socketio(server)
@@ -44,16 +45,11 @@ app.use((err,req,res,next) => {
 })
 
 io.on('connection', socket => {
-    
-    // request to make the room or join if it is present
-    socket.on('makeRoom' , room => {
-        if(!findRoom(room))
-            makeRoom(room)
-        u = findUser(socket.id,room)
-        if(u == undefined){
-            const user = joinUser(socket.id,room)
-            socket.join(user.room)
-        }
+    // to make a room for the connections
+    socket.on('joinRoom' , info => {
+        room = info.master > info.shepard ? `${info.shepard}+${info.master}` :  `${info.master}+${info.shepard}`
+        user = joinUser(room,info.shepard)
+        socket.join(user.room)
     })
 
     // sending the messages between the 2 users
@@ -61,7 +57,18 @@ io.on('connection', socket => {
     socket.on('msg' , info => socket.broadcast.to(info.room).emit('message', info.msg) )
     
     // checking the user when he is disconnected
-    socket.on('disconnect' , () => removeUser(socket.id))
+    // socket.on('disconnect' , () => removeUser(socket.id))
+    
+    // when the user connects he joins all the rooms i.e. all the group he is in
+    socket.on('joinGroupRoom' , info => {
+        info.rooms.forEach(room => {
+            user = joinUser(room.toString(),info.id)
+            socket.join(user.room)
+        })
+    })
+
+    // to send the message to all the users who are connected to the room in the groups
+    socket.on('sendmsg' , info => socket.broadcast.to(info.room).emit('message', info.msg))
 })
 
 // setting up the server

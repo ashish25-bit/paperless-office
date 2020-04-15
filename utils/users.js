@@ -1,14 +1,9 @@
 let users = []
 
-function joinUser (id,room) {
+function joinUser (room,id) {
     user = {room,id}
     users.push(user)
-    console.log(users)
     return user
-}
-
-function findUser(id,room) {
-    return users.find(user => user.id == id && user.room == room)
 }
 
 function removeUser(id) {
@@ -16,4 +11,5 @@ function removeUser(id) {
     users.splice(index,1)[0]
 }
 
-module.exports = {joinUser,findUser,removeUser}
+
+module.exports = {joinUser,removeUser}
