@@ -4,7 +4,7 @@ const session = require('express-session')
 const pageRouter = require('./routes/pages')
 const socketio = require('socket.io') 
 const http = require('http')
-const {joinUser,removeUser} = require('./utils/users')
+const {joinUser,removeUser,findUser} = require('./utils/users')
 const User = require('./core/user') 
 
 const uu = new User()
@@ -48,8 +48,10 @@ io.on('connection', socket => {
     // to make a room for the connections
     socket.on('joinRoom' , info => {
         room = info.master > info.shepard ? `${info.shepard}+${info.master}` :  `${info.master}+${info.shepard}`
-        user = joinUser(room,info.shepard)
-        socket.join(user.room)
+        if (findUser(room,info.shepard) < 0){
+            user = joinUser(room,info.shepard)
+            socket.join(user.room)
+        }
     })
 
     // sending the messages between the 2 users
@@ -62,8 +64,10 @@ io.on('connection', socket => {
     // when the user connects he joins all the rooms i.e. all the group he is in
     socket.on('joinGroupRoom' , info => {
         info.rooms.forEach(room => {
-            user = joinUser(room.toString(),info.id)
-            socket.join(user.room)
+            if(findUser(room.toString(),info.id) < 0) {
+                user = joinUser(room.toString(),info.id)
+                socket.join(user.room)
+            }
         })
     })
 

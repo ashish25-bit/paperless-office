@@ -207,14 +207,6 @@ User.prototype = {
         })
     },
 
-    conn_name : (id, callback) => {
-        let query = 'SELECT users.Name,users.DP,users.id FROM users INNER JOIN connections ON users.id = connections.master WHERE connections.shepard=?'
-        db.query(query, id, (err,result) => {
-            if(err) throw err
-            callback(result)
-        })
-    },
-
     new_conn : (id, callback) => {
         let query = 'SELECT users.Name,users.id FROM users INNER JOIN connections ON users.id=connections.shepard WHERE connections.master = ? ORDER BY connections.id DESC '
 
@@ -380,7 +372,39 @@ User.prototype = {
         callback(true)    
     },
 
-    
+    // to get everything
+    get_everything : (id, callback) => {
+        let info = []
+        conn = []
+        gggg = []
+        let conn_query =  'SELECT users.Name, users.id FROM users INNER JOIN connections ON users.id=connections.master WHERE connections.shepard=? ORDER BY users.Name ASC '
+        db.query(conn_query, id , (err,res) => {
+            if(err) throw err
+            else {
+                if(res.length) {
+                    res.forEach(element => {
+                        i = {Name : element.Name , id : element.id}
+                        conn.push(i)
+                    })  
+                }
+                info.push(conn)
+            }
+            
+            let g_query = 'SELECT groups.Name,groups.id,groupmembers.type FROM groups INNER JOIN groupmembers ON groups.id=groupmembers.groupid WHERE groupmembers.memberid = ? ORDER BY groups.Name ASC'
+
+            db.query(g_query, id, (err,res2) => {
+                if(res2.length) {
+                    res2.forEach(e => {
+                        i2 = {Name : e.Name, gid : e.id, type : e.type}
+                        gggg.push(i2)
+                    })
+                }
+                info.push(gggg)
+                callback(info)
+            })            
+        })
+    }
+      
 }
 
 module.exports = User

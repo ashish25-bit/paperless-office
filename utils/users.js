@@ -11,5 +11,8 @@ function removeUser(id) {
     users.splice(index,1)[0]
 }
 
+function findUser(room,id) {
+    return users.findIndex(user => user.room == room && user.id == id)
+}
 
-module.exports = {joinUser,removeUser}
+module.exports = {joinUser,removeUser,findUser}

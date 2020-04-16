@@ -422,14 +422,9 @@ router.get('/chat', (req, res, next) => {
 })
 
 // get all the people connected to the person in the chat room
-router.get('/chats' , (req,res,next) => {
-    if(req.session.user){
-        user.conn_name(req.session.user.id , (result) => {
-            res.send(result)
-        })
-    }
-    else 
-        res.redirect('/')
+router.get('/get_everything' , (req,res,next) => {
+    if(req.session.user)
+        user.get_everything(req.session.user.id , (result) => res.send(result))
 })
 
 // request to post the group details into the database

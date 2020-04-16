@@ -14,6 +14,7 @@ ids = [] //  ids of the users
 selected_id = [] //  the selected ids for making the group
 acfg = '' // allowed chats for groups (only these chats are allowed to be added in the groups as other people may not follow the user)
 group_member = [] // this will contain the ids of the group
+group_details = [] // this will contain the group details of a group i.e. Name and type
 let loggedIn // this will contain the id of the logged in User  
 let gid // this will contain the group id of the current opened group
 let b_members = [] // this will contain the ids of the users who are bidirectionally connected the logged in user
@@ -29,8 +30,8 @@ const socket = io()
         method : 'GET',
         success : response => loggedIn = parseInt(response)
     })
-    get_message()
     get_chats()
+    //get_message()
 }
 
 // to get the recent messages this includes the personal chats and group chats order by the time.
@@ -45,21 +46,35 @@ function get_message(){
 // to get the chat names
 function get_chats(){
     $.ajax({
-        url : '/chats',
+        url : '/get_everything',
         method : 'GET',
         success : (response) => {
-            if(response.length) {
-                response.forEach(element => {
+            if(response[0].length) {
+                response[0].forEach(element => {
                     chats_available.push(element.Name)
                     ids.push(element.id)
                     memberAllowed(element.id,element.Name)
                 })
             }
+            if(response[1].length) {
+                response[1].forEach(element => {
+                    group_member.push(element.gid)
+                    det = {Name : element.Name, type : element.type}
+                    group_details.push(det)
+                })
+            }
+            joinUserToRoom()
         }
     })
 }
 
-// the chat container which will contain the names of the poeple who the logged in user is connected
+function joinUserToRoom() {
+    console.log(loggedIn)
+    // this is to join the user to all rooms of the groups he is part of.
+    socket.emit('joinGroupRoom' , {rooms : group_member , id : loggedIn})
+}
+
+// the chat container which will contain the names of the poeple who the logged in user is connected with
 document.querySelector('.chats_con_display').addEventListener('click' , () => {
     groupInfoView()
     display_none()
@@ -145,27 +160,13 @@ function getGroups() {
     display_none()
     group_con.style.display = 'block'
     g = ''
-    $.ajax({
-        url : '/get_groups',
-        method : 'GET',
-        success : (response) => {
-            if(response.length){
-                response.forEach(element => {
-                    g += `<p class="group">${element.Name}</p>`
-                    group_member.push(element.id)
-                })
-            }
-            else g = 'No groups found' 
+    if(group_details.length)
+        group_details.forEach(element => {g += `<p class="group">${element.Name}</p>`})
+    else g = 'No groups found'
 
-            group_con.innerHTML = g
-
-            // this is to join the user to all rooms of the groups he is part of.
-            socket.emit('joinGroupRoom' , {rooms : group_member , id : loggedIn})
-
-            // adding the event listener for each group
-            groupChatWindow()            
-        }
-    })
+    group_con.innerHTML = g
+    // adding the event listener for each group
+    groupChatWindow() 
 }
 
 // for creating groups
