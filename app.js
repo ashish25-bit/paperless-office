@@ -4,7 +4,7 @@ const session = require('express-session')
 const pageRouter = require('./routes/pages')
 const socketio = require('socket.io') 
 const http = require('http')
-const {joinUser,removeUser,findUser} = require('./utils/users')
+const {joinUser,removeUser,findUser,showRoom} = require('./utils/users')
 const User = require('./core/user') 
 
 const uu = new User()
@@ -47,32 +47,31 @@ app.use((err,req,res,next) => {
 io.on('connection', socket => {
     // to make a room for the connections
     socket.on('joinRoom' , info => {
-        room = info.master > info.shepard ? `${info.shepard}+${info.master}` :  `${info.master}+${info.shepard}`
-        if (findUser(room,info.shepard) < 0){
-            user = joinUser(room,info.shepard)
+        info.id1.forEach(i => {
+            room = i > info.id ? `${info.id}+${i}` : `${i}+${info.id}`
+            user = joinUser(room,socket.id)
             socket.join(user.room)
-        }
+        })
+
     })
 
-    // sending the messages between the 2 users
-    // socket.broadcast.to(roomName) will send the message to all the users connected in the room except the sender
-    socket.on('msg' , info => socket.broadcast.to(info.room).emit('message', info.msg) )
-    
     // checking the user when he is disconnected
-    // socket.on('disconnect' , () => removeUser(socket.id))
+    socket.on('disconnect' , () => removeUser(socket.id))
     
     // when the user connects he joins all the rooms i.e. all the group he is in
     socket.on('joinGroupRoom' , info => {
         info.rooms.forEach(room => {
             if(findUser(room.toString(),info.id) < 0) {
-                user = joinUser(room.toString(),info.id)
+                user = joinUser(room.toString(),socket.id)
                 socket.join(user.room)
             }
         })
     })
 
     // to send the message to all the users who are connected to the room in the groups
-    socket.on('sendmsg' , info => socket.broadcast.to(info.room).emit('message', info.msg))
+    socket.on('sendmsg' , info => socket.broadcast.to(info.room).emit('message', info.msg) )
+
+    socket.on('showRoom' , () => showRoom())
 })
 
 // setting up the server

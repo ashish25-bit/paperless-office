@@ -15,4 +15,8 @@ function findUser(room,id) {
     return users.findIndex(user => user.room == room && user.id == id)
 }
 
-module.exports = {joinUser,removeUser,findUser}
+function showRoom() {
+    console.log(users)
+}
+
+module.exports = {joinUser,removeUser,findUser,showRoom}

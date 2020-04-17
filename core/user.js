@@ -372,26 +372,22 @@ User.prototype = {
         callback(true)    
     },
 
-    // to get everything
     get_everything : (id, callback) => {
-        let info = []
-        conn = []
+        info = []
+        ids = []
         gggg = []
-        let conn_query =  'SELECT users.Name, users.id FROM users INNER JOIN connections ON users.id=connections.master WHERE connections.shepard=? ORDER BY users.Name ASC '
-        db.query(conn_query, id , (err,res) => {
-            if(err) throw err
-            else {
-                if(res.length) {
-                    res.forEach(element => {
-                        i = {Name : element.Name , id : element.id}
-                        conn.push(i)
-                    })  
-                }
-                info.push(conn)
-            }
-            
+        ids.push(id)
+        ids.push(id)
+        let query = 'SELECT room,COUNT(*) FROM connections WHERE shepard=? OR master=? GROUP BY room HAVING COUNT(*)=2'
+        conn = []
+        db.query(query,ids,(err,res) => {
+            res.forEach(e => {
+                ii = e.room.split('+')
+                i = parseInt(ii[0]) == id ? parseInt(ii[1]) : parseInt(ii[0])
+                conn.push(i)
+            })
+            info.push(conn)
             let g_query = 'SELECT groups.Name,groups.id,groupmembers.type FROM groups INNER JOIN groupmembers ON groups.id=groupmembers.groupid WHERE groupmembers.memberid = ? ORDER BY groups.Name ASC'
-
             db.query(g_query, id, (err,res2) => {
                 if(res2.length) {
                     res2.forEach(e => {
@@ -401,10 +397,20 @@ User.prototype = {
                 }
                 info.push(gggg)
                 callback(info)
-            })            
+            })  
+            
         })
-    }
-      
+    },
+
+    // get the names of the connected users
+    names : (id, callback) => {
+        let query = 'SELECT Name FROM users WHERE id=?'
+        db.query(query,id,(err,res) => {
+            if(err) throw err
+            console.log(res)
+            callback(res)
+        })
+    }      
 }
 
 module.exports = User

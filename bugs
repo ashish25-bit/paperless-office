@@ -20,3 +20,6 @@
 1. make the room
 2. check whether the room is present and if present join the room
 3. As soon as both the users leaves the chat room should be canceled 
+
+
+SELECT room,COUNT(*) FROM `connections` WHERE shepard=9 OR master=9 GROUP BY room HAVING COUNT(*)=2 

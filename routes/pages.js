@@ -563,4 +563,11 @@ router.post('/add_members' , (req,res,next) => {
     user.add_members(req.body , result => res.send(result))
 })
 
+// get the names
+router.get('/get_names' , (req,res,next) => {
+    if(req.session.user) {
+        user.names(req.query.id , (result) => res.send(result))
+    }
+})
+
 module.exports = router

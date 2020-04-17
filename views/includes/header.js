@@ -19,3 +19,5 @@ function getDP(){
             }
         })
 }
+
+document.querySelector('.logout').addEventListener('click' , () => sessionStorage.clear())
