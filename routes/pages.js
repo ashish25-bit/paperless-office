@@ -572,4 +572,14 @@ router.get('/get_names' , (req,res,next) => {
     else    res.redirect('/')
 })
 
+// post the sent message into the database
+router.post('/put_message', (req,res,next) => {
+    input = {
+        room : req.body.room,
+        msg : req.body.msg,
+        sent : parseInt(req.body.sent),
+        type : req.body.type
+    }
+    user.put_message(input, (result) => res.send(result))
+})
 module.exports = router

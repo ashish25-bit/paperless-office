@@ -396,7 +396,23 @@ User.prototype = {
             if(err) throw err
             callback(res)
         })
-    }      
+    },
+
+    // put the message in the database
+    put_message : (body, callback) => {
+        let info = []
+        for(element in  body)
+            info.push(body[element])
+        d = moment().format('LL')
+        t = moment().format('LT')
+        info.push(d)
+        info.push(t)
+        let query = 'INSERT INTO messages (room,message,sent,type,Date,Time) VALUES (?, ?, ?, ?, ?, ?)'
+        db.query(query, info, (err,res) => {
+            if(err) throw err
+            else callback('message added')
+        }) 
+    }
 }
 
 module.exports = User

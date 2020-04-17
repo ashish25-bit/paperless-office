@@ -75,7 +75,6 @@ function get_chats() {
             }
         }
     }).then(joinUserToRoom).then(getChatName)
-    //
 }
 
 function getChatName() {
@@ -145,6 +144,7 @@ function chatting(id) {
         if(i.value != ''){
             appendMsg(i.value , 'ques')
             socket.emit('sendmsg' , {msg : i.value , room : roomid})
+            messageToDatabase(roomid,i.value,loggedIn,'text')
         }
         i.value = ''
         i.focus()
@@ -155,6 +155,7 @@ function chatting(id) {
             if(i.value != ''){
                 appendMsg(i.value,'ques')
                 socket.emit('sendmsg' , {msg : i.value , room : roomid})
+                messageToDatabase(roomid,i.value,loggedIn,'text')
                 i.value = ''
             }
         }
@@ -277,6 +278,7 @@ function groupChatWindow() {
                 if(i.value != '') {
                     appendMsg(i.value , 'ques')
                     socket.emit('sendmsg' , {room : gid , msg : i.value})
+                    messageToDatabase(gid,i.value,loggedIn,'text')
                     i.value = ''
                     i.focus()
                 }
@@ -288,6 +290,7 @@ function groupChatWindow() {
                     if(i.value != ''){
                         appendMsg(i.value,'ques')
                         socket.emit('sendmsg' , {room : gid , msg : i.value})
+                        messageToDatabase(gid,i.value,loggedIn,'text')
                         i.value = ''
                     }
                 }
@@ -461,7 +464,6 @@ function appendMsg(msg,cls) {
 }
 
 document.querySelector('.msg_con_display').addEventListener('click' , () => {
-    console.log(loggedIn)
     groupInfoView()
     display_none()
     msg_con.style.display = 'block'
@@ -478,4 +480,14 @@ function display_none() {
     chat_con.style.display  = 'none'
     msg_con.style.display   = 'none'
     group_con.style.display = 'none'
+}
+
+function messageToDatabase(room,msg,sent,type) {
+    info = {room,msg,sent,type}
+    $.ajax({
+        url : '/put_message',
+        method : 'POST',
+        data : info,
+        success : (response) => console.log(response)
+    })
 }
