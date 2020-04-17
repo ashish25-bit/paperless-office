@@ -7,8 +7,12 @@ function joinUser (room,id) {
 }
 
 function removeUser(id) {
-    index = users.findIndex(user => user.id == id)
-    users.splice(index,1)[0]
+    for(i=0;i<users.length;i++) {
+        if(users[i].id == id) {
+            users.splice(i,1)[0]
+            i--
+        }
+    }
 }
 
 function findUser(room,id) {

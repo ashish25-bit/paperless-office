@@ -216,19 +216,6 @@ User.prototype = {
         })
     },
 
-    // to check the users are connected bidirectionally
-    get_con_status : (master, shepard, callback) => {
-        ids = []
-        master = parseInt(master)
-        ids.push(master)
-        ids.push(shepard)
-        let query = 'SELECT id FROM connections WHERE shepard = ? AND master = ?'
-        db.query(query,ids, (err,res) => {
-            if(err) throw err
-            callback(res)
-        })
-    },
-
     create_group : (name, m , callback) => {
 
         time = moment().format('MMMM Do YYYY, h:mm:ss A')
@@ -407,7 +394,6 @@ User.prototype = {
         let query = 'SELECT Name FROM users WHERE id=?'
         db.query(query,id,(err,res) => {
             if(err) throw err
-            console.log(res)
             callback(res)
         })
     }      

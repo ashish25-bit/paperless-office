@@ -11,13 +11,13 @@ const messages = document.querySelector('.messages')
 chats_available = [] // name of the users which the logged in user is connected with
 let newMembers 
 selected_id = [] //  the selected ids for making the group
-acfg = '' // allowed chats for groups (only these chats are allowed to be added in the groups as other people may not follow the user)
+acfg = '' // allowed connections for groups (only these chats are allowed to be added in the groups as other people may not follow the user)
 group_member = [] // this will contain the ids of the group
 group_details = [] // this will contain the group details of a group i.e. Name and type
 let gid // this will contain the group id of the current opened group
 let b_members = [] // this will contain the ids of the users who are bidirectionally connected the logged in user
 const socket = io() 
-let loggedIn
+let loggedIn // this will contain the id of the user who is currently logged in 
 
 {
     menu_options.style.display = 'none'
@@ -29,6 +29,19 @@ let loggedIn
 // to get the recent messages this includes the personal chats and group chats order by the time.
 function get_message() {
     socket.emit('showRoom')
+    roomids = []
+    roomids.push(b_members)
+    roomids.push(group_member)
+
+    $.ajax({
+        url : '/get_messages',
+        method : 'GET',
+        data : {rooms : roomids},
+        success : response => {
+            console.log(chats_available)
+            console.log(response)
+        }
+    })
 }
 
 /*  *************************************************
@@ -36,7 +49,7 @@ function get_message() {
     ************************************************* */
 
 // to get the chat names
-function get_chats(){
+function get_chats() {
     // get the id of the logged in user
     $.ajax({
         url : '/getid',
@@ -78,6 +91,7 @@ function getChatName() {
             }
         })
     })
+    get_message()
 }
 
 function joinUserToRoom() {
@@ -92,45 +106,29 @@ document.querySelector('.chats_con_display').addEventListener('click' , () => {
     display_none()
     chat_con.style.display = 'block'
     res = ''
-    console.log(chats_available)
     if(chats_available.length > 0) {
         chats_available.forEach(element => res += `<p class="chat_name">${element}</p>`)
         $('.chats').html(res)
-    }
-    else
-        $('.chats').html('You are not connected to anyone')    
 
-    chats = document.querySelectorAll('.chat_name')
-    chats.forEach((element,index) => {
-        element.addEventListener('click' ,() => {
-            $.ajax({
-                url : '/conn_status',
-                method : 'GET',
-                data : {id : b_members[index]},
-                success : (response) => {
-                    dd = document.createElement('div')
-                    if(response.length > 0) {
-                        dd.classList.add('chat_name_msg')
-                        res  = `<p class="chat_name_display">${chats_available[index]}</p>`
-                        res += `<div class="chat_message"></div>`
-                        res += input_box
-                        dd.innerHTML = res
-                        if(messages.childNodes.length > 1) 
-                            messages.removeChild(messages.childNodes[1])
-                        messages.appendChild(dd)
-                        getChatMessages(b_members[index])
-                        chatting(b_members[index])
-                    }
-                    else {
-                        dd.innerText = 'you are not connected bidirectionally'
-                        if(messages.childNodes.length > 1) 
-                            messages.removeChild(messages.childNodes[1])
-                        messages.appendChild(dd)
-                    }
-                }
+        chats = document.querySelectorAll('.chat_name')
+        chats.forEach((element,index) => {
+            element.addEventListener('click' ,() => {
+                dd = document.createElement('div')
+                res = `<p class="chat_name_display">${chats_available[index]}</p>`
+                res += `<div class="chat_message"></div>`
+                res += input_box
+                dd.innerHTML = res
+                if(messages.childNodes.length > 1) 
+                    messages.removeChild(messages.childNodes[1])
+                messages.appendChild(dd)
+                getChatMessages(b_members[index])
+                chatting(b_members[index])
             })
         })
-    })
+    }
+    
+    else
+        $('.chats').html('You are not connected to anyone')    
 })
 
 // getting the messages of the logged with a specific person 
@@ -395,7 +393,7 @@ document.querySelector('.add_mem_btn').addEventListener('click' , () => {
         if(id != loggedIn)
             mids.push(id)
     })
-    new_add_mem = b_members.filter(n => { return mids.indexOf(n) == -1} ) //this will contain the ids of the members who can be joined in the group
+    new_add_mem = b_members.filter(n => { return mids.indexOf(n) == -1} ) // this will contain the ids of the members who can be joined in the group
     mmm = ''
     new_add_mem.forEach(n => {
         i = b_members.indexOf(n)
@@ -446,6 +444,10 @@ document.querySelector('.add_members').addEventListener('click' , () => {
 // getting the message from the user
 socket.on('message' , msg => appendMsg(msg,'ans'))
 
+/*  ***********************************************
+    some random stuff
+    *********************************************** */
+
 // appending the send and received messages to the chat container
 function appendMsg(msg,cls) {
     time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' , hour12 : 'false'})
@@ -458,32 +460,12 @@ function appendMsg(msg,cls) {
     msg_con.scrollTop = msg_con.scrollHeight
 }
 
-/*  ***********************************************
-    some random stuff
-    *********************************************** */
-
 document.querySelector('.msg_con_display').addEventListener('click' , () => {
     console.log(loggedIn)
     groupInfoView()
     display_none()
     msg_con.style.display = 'block'
 })
-
-// to get the chats which can be added in the group. only the people who are connected bidirectinally with the logged in user will be added in the array.
-function memberAllowed(id,name) {
-    $.ajax({
-        url : '/conn_status',
-        method : 'GET',
-        data : {id : id},
-        success : (response) => {
-            if(response.length) {
-                acfg += `<p class="chat_name chat_for_group">${name}</p>`
-                b_members.push(id)
-                socket.emit('joinRoom' , {master:id,shepard:loggedIn})
-            }
-        }
-    })    
-}
 
 // the menu button which will contain the options such as -> create group
 document.querySelector('.menu_chat_btn').addEventListener('click' , () => menu_chat() , false)

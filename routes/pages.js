@@ -425,6 +425,7 @@ router.get('/chat', (req, res, next) => {
 router.get('/get_everything' , (req,res,next) => {
     if(req.session.user)
         user.get_everything(req.session.user.id , (result) => res.send(result))
+    else    res.redirect('/')
 })
 
 // request to post the group details into the database
@@ -441,8 +442,10 @@ router.post('/create_group' , (req,res,next) => {
 // get request for getting the messages
 router.get('/get_messages' , (req,res,next) => {
     if(req.session.user){
-        user.getMessages(req.session.user.id)
+        console.log(req.query)
+        res.send('ok')
     }
+    else    res.redirect('/')
 })
 
 // request for getting the newly formed connections
@@ -450,17 +453,7 @@ router.get('/get_conn_noti' , (req,res,next) => {
     if(req.session.user) {
         user.new_conn(req.session.user.id, (result) => res.send(result))
     }
-})
-
-// get request to check the whether the users are connected bidirectionally
-router.get('/conn_status' , (req,res,next) => {
-    if(req.session.user){
-        id = req.query.id
-        user.get_con_status(id,req.session.user.id, (result) => {
-            res.send(result)
-        })
-    }
-    else res.redirect('/')
+    else    res.redirect('/')
 })
 
 // get all the groups user is in.
@@ -469,6 +462,7 @@ router.get('/get_groups' , (req,res,next) => {
         id = req.session.user.id
         user.get_groups(id, (result) => res.send(result) )
     }
+    else    res.redirect('/')
 })
 
 // request to get the document page
@@ -485,6 +479,7 @@ router.get('/docs' , (req,res,next) =>{
             })
         })
     }
+    else    res.redirect('/')
 })
 
 
@@ -525,6 +520,7 @@ router.get(`/editor/:email/:id` , (req,res,next) => {
                 res.send('document not found')
         })
     }   
+    else    res.redirect('/')
 })
 
 // request to fetch sign for the editor
@@ -535,12 +531,16 @@ router.get('/fetch_sign' , (req,res,next) => {
         else 
             res.send('Password is wrong')
     }    
+    else    res.redirect('/')
 })
 
 // to get the id of the user logged in
 router.get('/getid', (req,res,next) => {
-    id = req.session.user.id.toString()
-    res.send(id)
+    if(req.session.user) {
+        id = req.session.user.id.toString()
+        res.send(id)
+    }
+    else    res.redirect('/')
 }) 
 
 // to get all the users in a group
@@ -549,6 +549,7 @@ router.get('/group_members' , (req,res,next) => {
         id = req.query.id
         user.getMembers(id, (result) => res.send(result) )       
     }
+    else    res.redirect('/')
 })
 
 // request for making the user admin of the group
@@ -568,6 +569,7 @@ router.get('/get_names' , (req,res,next) => {
     if(req.session.user) {
         user.names(req.query.id , (result) => res.send(result))
     }
+    else    res.redirect('/')
 })
 
 module.exports = router
