@@ -412,7 +412,19 @@ User.prototype = {
             if(err) throw err
             else callback('message added')
         }) 
+    },
+
+    // get the messages 
+    getMsg : (room, callback) => {
+        let query = 'SELECT id,message,Time,Date FROM messages WHERE id=(SELECT MAX(id) FROM messages WHERE room=?)'
+        db.query(query,room,(err,res) => {
+            console.log(res)
+            if(err) throw err
+            else callback(res)
+        })
     }
+
 }
+
 
 module.exports = User

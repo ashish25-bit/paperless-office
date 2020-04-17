@@ -858,6 +858,14 @@ textarea{
     text-align: center;
     border-bottom: 1px #ccc solid;
 }
+
+.msg_recent_con{
+    border-bottom: 1px #ccc solid;
+    padding: 10px 5px;
+    cursor: pointer;
+}
+
+/* styling for document */
 .docs_media_con{
     margin: 10px 0;
     text-align: center;

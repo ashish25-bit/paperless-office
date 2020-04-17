@@ -18,6 +18,7 @@ let gid // this will contain the group id of the current opened group
 let b_members = [] // this will contain the ids of the users who are bidirectionally connected the logged in user
 const socket = io() 
 let loggedIn // this will contain the id of the user who is currently logged in 
+sm = [] // this the contain the messages which will be displayed in the msg_con
 
 {
     menu_options.style.display = 'none'
@@ -30,18 +31,30 @@ let loggedIn // this will contain the id of the user who is currently logged in
 function get_message() {
     socket.emit('showRoom')
     roomids = []
-    roomids.push(b_members)
-    roomids.push(group_member)
-
-    $.ajax({
-        url : '/get_messages',
-        method : 'GET',
-        data : {rooms : roomids},
-        success : response => {
-            console.log(chats_available)
-            console.log(response)
-        }
+    names = []
+    b_members.forEach((id,index) => {
+        roomids.push(id>loggedIn ? `${loggedIn}+${id}` : `${id}+${loggedIn}`)
+        names.push(chats_available[index])
     })
+    group_member.forEach((id,index) => {
+        roomids.push(id.toString())
+        names.push(group_details[index].Name)
+    })
+    roomids.forEach((room,index) => {
+        $.ajax({
+            url : '/get_messages',
+            method : 'GET',
+            async : false,
+            data : {room : room},
+            success : response => {
+                if(response.length){
+                    response[0].name = names[index]
+                    sm.push(response)                    
+                }
+            }
+        })
+    })
+    display_messages()
 }
 
 /*  *************************************************
@@ -82,7 +95,7 @@ function getChatName() {
         $.ajax({
             url : '/get_names',
             method : 'GET', 
-            async : true,
+            async : false,
             data : {id : id},
             success : (response) => {
                 chats_available.push(response[0].Name)
@@ -113,7 +126,8 @@ document.querySelector('.chats_con_display').addEventListener('click' , () => {
         chats.forEach((element,index) => {
             element.addEventListener('click' ,() => {
                 dd = document.createElement('div')
-                res = `<p class="chat_name_display">${chats_available[index]}</p>`
+                dd.classList.add('chat_name_msg')
+                res  = `<p class="chat_name_display">${chats_available[index]}</p>`
                 res += `<div class="chat_message"></div>`
                 res += input_box
                 dd.innerHTML = res
@@ -262,9 +276,8 @@ function groupChatWindow() {
             gid = group_member[index]
             $('.g_name').html(element.innerHTML)
             let dd = document.createElement('div')
-            dd.classList.add('chat_name_msg')
-            res  = '<div class="chat_name_msg">' 
-            res += `<div class="group_chat_header"><div class="chat_name_display">${element.innerHTML}</div><button class="group_info_btn">Group Info</button></div>`
+            dd.classList.add('chat_name_msg') 
+            res  = `<div class="group_chat_header"><div class="chat_name_display">${element.innerHTML}</div><button class="group_info_btn">Group Info</button></div>`
             res += `<div class="chat_message"></div>`
             res += input_box
             dd.innerHTML = res
@@ -483,11 +496,17 @@ function display_none() {
 }
 
 function messageToDatabase(room,msg,sent,type) {
+    msg = msg.trim()
     info = {room,msg,sent,type}
     $.ajax({
         url : '/put_message',
         method : 'POST',
-        data : info,
-        success : (response) => console.log(response)
+        data : info
     })
+}
+
+function display_messages() {
+    ss = ''
+    sm.forEach(e => ss += `<div class="msg_recent_con"><p class="msg_recent_name">${e[0].name}</p><p class="msg_recent_date">${e[0].Date}</p><p class="msg_recent_msg">${e[0].message}</p><p class="msg_recent_time">${e[0].Time}</p></div>`)
+    $('.message').html(ss)
 }

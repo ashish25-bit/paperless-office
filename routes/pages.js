@@ -438,16 +438,6 @@ router.post('/create_group' , (req,res,next) => {
 
 })
 
-
-// get request for getting the messages
-router.get('/get_messages' , (req,res,next) => {
-    if(req.session.user){
-        console.log(req.query)
-        res.send('ok')
-    }
-    else    res.redirect('/')
-})
-
 // request for getting the newly formed connections
 router.get('/get_conn_noti' , (req,res,next) => {
     if(req.session.user) {
@@ -580,6 +570,15 @@ router.post('/put_message', (req,res,next) => {
         sent : parseInt(req.body.sent),
         type : req.body.type
     }
-    user.put_message(input, (result) => res.send(result))
+    user.put_message(input, (result) => console.log(result))
 })
+
+// get request for getting the messages
+router.get('/get_messages' , (req,res,next) => {
+    if(req.session.user){
+        user.getMsg(req.query.room, (result) => res.send(result))
+    }
+    else    res.redirect('/')
+})
+
 module.exports = router
