@@ -134,7 +134,8 @@ document.querySelector('.chats_con_display').addEventListener('click' , () => {
                 if(messages.childNodes.length > 1) 
                     messages.removeChild(messages.childNodes[1])
                 messages.appendChild(dd)
-                getChatMessages(b_members[index])
+                getChatMessages( b_members[index] > loggedIn ? `${loggedIn}+${b_members[index]}` : `${b_members[index]}+${loggedIn}`)
+                
                 chatting(b_members[index])
             })
         })
@@ -146,7 +147,14 @@ document.querySelector('.chats_con_display').addEventListener('click' , () => {
 
 // getting the messages of the logged with a specific person 
 function getChatMessages(id) {
-    console.log('Get the messages of a specific chat')
+    console.log(id)
+    $.ajax({
+        url : '/get_all_messages',
+        method : 'GET',
+        data : {id : id},
+        success : (response) => appendMsg2(response)
+    })
+
 }
 
 // this function is to send the messages between the users 
@@ -284,6 +292,8 @@ function groupChatWindow() {
             if(messages.childNodes.length > 1) 
                 messages.removeChild(messages.childNodes[1])
             messages.appendChild(dd)
+            // get all the chat messages for the group
+            getChatMessages(gid)
             send = document.querySelector('.msg_send_btn')
             i = document.querySelector('.msg_input')
 
@@ -476,6 +486,19 @@ function appendMsg(msg,cls) {
     msg_con.scrollTop = msg_con.scrollHeight
 }
 
+// appending all the messages to the container
+function appendMsg2(messages) {
+    messages.forEach(item => {
+        let div = document.createElement('div')
+        div.classList.add(item.sent == loggedIn ? 'ques' : 'ans')
+        m = `<p class="cm">${item.message}</p><br/><p class="ct">${item.Time}</p>`
+        div.innerHTML = m
+        let msg_con = document.querySelector(".chat_message")
+        msg_con.appendChild(div)
+        msg_con.scrollTop = msg_con.scrollHeight 
+    })
+}
+
 document.querySelector('.msg_con_display').addEventListener('click' , () => {
     groupInfoView()
     display_none()
@@ -507,6 +530,6 @@ function messageToDatabase(room,msg,sent,type) {
 
 function display_messages() {
     ss = ''
-    sm.forEach(e => ss += `<div class="msg_recent_con"><p class="msg_recent_name">${e[0].name}</p><p class="msg_recent_date">${e[0].Date}</p><p class="msg_recent_msg">${e[0].message}</p><p class="msg_recent_time">${e[0].Time}</p></div>`)
+    sm.forEach(e => ss += `<div class="msg_recent_con"><p class="msg_recent_name">${e[0].name}</p><p class="msg_recent_date">${e[0].Date}</p><div class="msg_recent_msg">${e[0].message}</div><p class="msg_recent_time">${e[0].Time}</p></div>`)
     $('.message').html(ss)
 }

@@ -576,9 +576,14 @@ router.post('/put_message', (req,res,next) => {
 // get request for getting the messages
 router.get('/get_messages' , (req,res,next) => {
     if(req.session.user){
-        user.getMsg(req.query.room, (result) => res.send(result))
+        user.getRecentMsg(req.query.room, (result) => res.send(result))
     }
     else    res.redirect('/')
+})
+
+// get all the messages for a particular room
+router.get('/get_all_messages' , (req,res,next) => {
+    user.get_all_messages(req.query.id , (result) => res.send(result))
 })
 
 module.exports = router

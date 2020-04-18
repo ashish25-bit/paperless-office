@@ -415,10 +415,19 @@ User.prototype = {
     },
 
     // get the messages 
-    getMsg : (room, callback) => {
+    getRecentMsg : (room, callback) => {
         let query = 'SELECT id,message,Time,Date FROM messages WHERE id=(SELECT MAX(id) FROM messages WHERE room=?)'
         db.query(query,room,(err,res) => {
             console.log(res)
+            if(err) throw err
+            else callback(res)
+        })
+    },
+
+    // get all the messages for a particular user
+    get_all_messages : (id, callback) => {
+        let query = 'SELECT message, Time, sent FROM messages WHERE room = ?'
+        db.query(query, id, (err,res) => {
             if(err) throw err
             else callback(res)
         })
