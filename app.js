@@ -4,7 +4,7 @@ const session = require('express-session')
 const pageRouter = require('./routes/pages')
 const socketio = require('socket.io') 
 const http = require('http')
-const {joinUser,removeUser,findUser,showRoom} = require('./utils/users')
+const {joinUser,removeUser,findUser,showRoom,userJoin,findUserAll} = require('./utils/users')
 const User = require('./core/user') 
 
 const uu = new User()
@@ -46,34 +46,36 @@ app.use((err,req,res,next) => {
 
 io.on('connection', socket => {
     // to make a room for the connections
-    socket.on('joinRoom' , info => {
-        info.id1.forEach(i => {
-            room = i > info.id ? `${info.id}+${i}` : `${i}+${info.id}`
-            user = joinUser(room,socket.id)
+    socket.on('joinRoom' , rooms => {
+        rooms.forEach(e => {
+            user = joinUser(e,socket.id)
             socket.join(user.room)
         })
-
     })
 
     // checking the user when he is disconnected
     socket.on('disconnect' , () => removeUser(socket.id))
-    
-    // when the user connects he joins all the rooms i.e. all the group he is in
-    socket.on('joinGroupRoom' , info => {
-        info.rooms.forEach(room => {
-            if(findUser(room.toString(),info.id) < 0) {
-                user = joinUser(room.toString(),socket.id)
-                socket.join(user.room)
-            }
-        })
-    })
 
-    // to send the message to all the users who are connected to the room in the groups
-    socket.on('sendmsg' , info => socket.broadcast.to(info.room).emit('message', info.msg) )
+    // to send the message to all the users who are connected in a room for personal chat
+    socket.on('sendmsg' , info => socket.broadcast.to(info.room).emit('message', {msg : info.msg , room : info.room}) )
 
+    // to send the message to all the users who are connected in a room for group chat
+    socket.on('sendGroupmsg' , info => socket.broadcast.to(info.room).emit('messageGroup', {msg : info.msg , from : info.name, room : info.room}) )
+
+    // join the user to the all users database
+    socket.on('join', id => userJoin(id,socket.id) )
+
+    // to show all the rooms
     socket.on('showRoom' , () => showRoom())
+
+    // added to the group
+    socket.on('added' , info => {
+        user = findUserAll(info.id) 
+        if(user != undefined)
+            io.to(user.sid).emit('addedGroup', {room:info.room})
+    })
 })
 
 // setting up the server
 const PORT = 3000 || process.env.PORT
-server.listen(PORT , () => console.log(`Server running on port ${PORT}`))
+server.listen(PORT , () => console.log(`Server running on port ${PORT}`)) 

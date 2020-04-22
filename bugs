@@ -23,3 +23,23 @@
 
 
 SELECT room,COUNT(*) FROM `connections` WHERE shepard=9 OR master=9 GROUP BY room HAVING COUNT(*)=2 
+
+
+{ room: '2', id: 'ku0PT0zuKLyjua6NAAAC' },
+  { room: '3', id: 'ku0PT0zuKLyjua6NAAAC' },
+  { room: '1', id: 'ku0PT0zuKLyjua6NAAAC' },
+  { room: '6', id: 'ku0PT0zuKLyjua6NAAAC' },
+  { room: '4+9', id: 'ku0PT0zuKLyjua6NAAAC' },
+  { room: '1+9', id: 'ku0PT0zuKLyjua6NAAAC' },
+  { room: '8+9', id: 'ku0PT0zuKLyjua6NAAAC' },
+  { room: '9+10', id: 'ku0PT0zuKLyjua6NAAAC' },
+  { room: '9+12', id: 'ku0PT0zuKLyjua6NAAAC' },
+  { room: '2', id: 'zZ6i-O7YJAtez-6fAAAD' },
+  { room: '3', id: 'zZ6i-O7YJAtez-6fAAAD' },
+  { room: '1+4', id: 'zZ6i-O7YJAtez-6fAAAD' },
+  { room: '4+12', id: 'zZ6i-O7YJAtez-6fAAAD' },
+  { room: '4+9', id: 'zZ6i-O7YJAtez-6fAAAD' },
+  { room: '1', id: 'ccWVgVDPnXeRSrKQAAAE' },
+  { room: '1+4', id: 'ccWVgVDPnXeRSrKQAAAE' },
+  { room: '1+9', id: 'ccWVgVDPnXeRSrKQAAAE' },
+  { room: '8+9', id: 'H3JB-edz1b7LYqcIAAAF' }

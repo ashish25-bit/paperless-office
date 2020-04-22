@@ -825,7 +825,7 @@ textarea{
 .ans .cm{
     padding: 10px;
     border-radius: 0 20px 20px 20px;
-    background: #9dc9b4;
+    background: #42bd7d;
 }
 .ques .cm{
     padding: 10px;
@@ -940,6 +940,33 @@ textarea{
     margin: 10px;
     background: #36827d;
     color: white;
+}
+.msg_name{
+    font-size: 10px;
+    position: relative;
+}
+.ans_n{
+    padding-left: 5px;
+}
+.ques_n{
+    padding-right: 5px;
+}
+.msg_name::before{
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    background: black;
+}
+
+.ans_n::before{
+    left: -0px;
+    background: #42bd7d;;
+}
+
+.ques_n::before{
+    background: #58dc98;
+    right: 0;
 }
 
 /* document styling */

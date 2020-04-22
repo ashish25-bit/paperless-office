@@ -252,7 +252,7 @@ User.prototype = {
     },
 
     get_groups : (id, callback) => {
-        let query = 'SELECT groups.Name,groups.id FROM groups INNER JOIN groupmembers ON groups.id=groupmembers.groupid WHERE groupmembers.memberid = ? ORDER BY groups.Name ASC'
+        let query = 'SELECT groups.id, groups.Name FROM groups INNER JOIN groupmembers ON groups.id=groupmembers.groupid WHERE groupmembers.memberid = ? ORDER BY groups.Name ASC'
         db.query(query,id, (err,res) => {
             if(err) throw err
             callback(res)
@@ -314,8 +314,6 @@ User.prototype = {
         let query = 'SELECT Password FROM documents WHERE id = ?'
         db.query(query,id, (err,result) => {
             if(err) throw err
-            console.log(pwd)
-            console.log(result.Password)
             callback(result.Password)
         })
     },
@@ -418,7 +416,6 @@ User.prototype = {
     getRecentMsg : (room, callback) => {
         let query = 'SELECT id,message,Time,Date FROM messages WHERE id=(SELECT MAX(id) FROM messages WHERE room=?)'
         db.query(query,room,(err,res) => {
-            console.log(res)
             if(err) throw err
             else callback(res)
         })
@@ -426,14 +423,36 @@ User.prototype = {
 
     // get all the messages for a particular user
     get_all_messages : (id, callback) => {
-        let query = 'SELECT message, Time, sent FROM messages WHERE room = ?'
+        let query = 'SELECT users.Name, messages.message, messages.Time, messages.sent FROM users INNER JOIN messages ON users.id=messages.sent WHERE messages.room = ? ORDER BY messages.id ASC'
+
         db.query(query, id, (err,res) => {
             if(err) throw err
             else callback(res)
+        })
+    },
+
+    // to get all the connections of the logged in user
+    connections : (id, callback) => {
+        let query = 'SELECT users.id, users.Name FROM users INNER JOIN connections ON users.id=connections.master WHERE shepard=? ORDER BY users.Name ASC'
+        db.query(query, id, (err,res) => {
+            if(err) throw err
+            callback(res)
+        })
+    },
+
+    // to check whether the requested user is bidirectionally connected
+    bconnection : (shepard, master, callback) => {
+        ids = []
+        ids.push(shepard)
+        ids.push(master)
+
+        let query = 'SELECT id FROM connections WHERE master=? AND shepard=?'
+        db.query(query, ids, (err,res) => {
+            if(err) throw err
+            callback(res)
         })
     }
 
 }
 
-
-module.exports = User
+module.exports = User 

@@ -12,10 +12,23 @@ block content
                 button(class="group_con_display") Groups
             p.pop_up_msg
             .container_msg_chats
-                .message
+                .message This is the message container
                 .chats
+                    if(info.connections.length)
+                        -info.connections.forEach(conn => {
+                            p(class="chat_name" data-connection-id=conn.id)= conn.Name  
+                        -})
+                    else 
+                        p You are not connected to anyone
                 .groups
+                    if(info.groups.length)
+                        -info.groups.forEach(group => {
+                            p(class="group" data-group-id=group.id)= group.Name
+                        -})
+                    else 
+                        p No Groups Found
             .group_select 
+
         .messages
             .group_info
                 p.g_name

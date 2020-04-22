@@ -411,14 +411,26 @@ router.get('/disconnect' , (req,res,next) =>{
 
 //request for chat room
 router.get('/chat', (req, res, next) => {
-    if(req.session.user){
-        res.render('chat_room', {
-            title : 'Chat Room',
-            user : req.session.user
+    info = {}
+    rooms = []
+    if(req.session.user) {
+        user.get_groups(req.session.user.id, (resultGroup) => {
+            info = {"groups" : resultGroup}
+            info['groups'].forEach(e => rooms.push(e.id.toString()) )
+            user.connections(req.session.user.id, (resultConn) => {
+                info.connections = resultConn
+                info.connections.forEach(e => rooms.push(req.session.user.id > e.id ? `${e.id}+${req.session.user.id}` : `${req.session.user.id}+${e.id}`))
+
+                res.render('chat_room', {
+                    title : 'Chat Room',
+                    user : req.session.user,
+                    info : info
+                })
+
+            })
         })
     }
-    else 
-        res.redirect('/')    
+    else res.redirect('/')
 })
 
 // get all the people connected to the person in the chat room
@@ -442,15 +454,6 @@ router.post('/create_group' , (req,res,next) => {
 router.get('/get_conn_noti' , (req,res,next) => {
     if(req.session.user) {
         user.new_conn(req.session.user.id, (result) => res.send(result))
-    }
-    else    res.redirect('/')
-})
-
-// get all the groups user is in.
-router.get('/get_groups' , (req,res,next) => {
-    if(req.session.user){
-        id = req.session.user.id
-        user.get_groups(id, (result) => res.send(result) )
     }
     else    res.redirect('/')
 })
@@ -528,7 +531,7 @@ router.get('/fetch_sign' , (req,res,next) => {
 router.get('/getid', (req,res,next) => {
     if(req.session.user) {
         id = req.session.user.id.toString()
-        res.send(id)
+        res.send({id : id, name : req.session.user.Name})
     }
     else    res.redirect('/')
 }) 
@@ -551,7 +554,7 @@ router.post('/make_admin', (req,res,next) => {
 
 // request for adding the members
 router.post('/add_members' , (req,res,next) => {
-    user.add_members(req.body , result => res.send(result))
+    user.add_members(req.body , result => res.send(result)) 
 })
 
 // get the names
@@ -584,6 +587,18 @@ router.get('/get_messages' , (req,res,next) => {
 // get all the messages for a particular room
 router.get('/get_all_messages' , (req,res,next) => {
     user.get_all_messages(req.query.id , (result) => res.send(result))
+})
+
+// to get the bidirectional connections
+router.get('/bidirectional_connections' , (req,res,next) => {
+    user.bconnection(req.session.user.id, req.query.master, (result) => res.send(result))
+})
+
+// refresh the div to get the groups
+router.get('/refresh_groups' , (req,res,next) => {
+    if(req.session.user) {
+        user.get_groups(req.session.user.id, result => res.send(result))
+    }
 })
 
 module.exports = router
