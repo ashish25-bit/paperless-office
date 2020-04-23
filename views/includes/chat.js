@@ -187,6 +187,17 @@ function messageToDatabase(room, msg, sent, type) {
     })
 }
 
+// to get the group members when the member button is clicked
+$('.show_members').on('click' , () => getGroupMembers(gid))
+// to get the shared documents when the document button is clicked
+$('.show_docs').on('click' , () => {
+    $('.docs_media').html('No documents yet')
+})
+// to get the media shared in the group 
+$('.show_media').on('click' , () => {
+    $('.docs_media').html('No media yet')
+})
+
 // get all the group members for a particular
 function getGroupMembers(id) {
     id = parseInt(id)
@@ -224,16 +235,35 @@ function getGroupMembers(id) {
     .then(() => {
         // checking whether the make admin button exists
         let ma = document.querySelectorAll('.make_admin_btn')
-        // if btn exists the event listener will be added
+        // if btn exists the event listener will be added   
         if(ma.length) {
-            ma.forEach(element => {
+            ma.forEach(element =>  {
                 element.addEventListener('click' , () => {
-                    console.log('he/she will be made member')
-                })
+                    i = parseInt(element.getAttribute('data-profile-id'))
+                    g = parseInt(id)
+                    info = {gid:g, mid:i}
+                    parent = element.parentElement
+                    span = document.createElement('span')
+                    $.ajax({
+                        url : '/make_admin',
+                        method : 'POST',
+                        data : info,
+                        success : response => {
+                            if(response != 'Error in making admin') {
+                                element.style.display = 'none'
+                                span.innerText = 'Admin'
+                            }
+                            else 
+                                span.innerText = response
+                            parent.appendChild(span)
+                        }
+                    })
+                }) 
             })
         }
     })
 }
+// UPDATE `groupmembers` SET type='member' WHERE groupid=2 AND memberid=4
 
 // to add the members in the group
 document.querySelector('.add_mem_btn').addEventListener('click' , () => {

@@ -357,36 +357,6 @@ User.prototype = {
         callback(true)    
     },
 
-    get_everything : (id, callback) => {
-        info = []
-        ids = []
-        gggg = []
-        ids.push(id)
-        ids.push(id)
-        let query = 'SELECT room,COUNT(*) FROM connections WHERE shepard=? OR master=? GROUP BY room HAVING COUNT(*)=2'
-        conn = []
-        db.query(query,ids,(err,res) => {
-            res.forEach(e => {
-                ii = e.room.split('+')
-                i = parseInt(ii[0]) == id ? parseInt(ii[1]) : parseInt(ii[0])
-                conn.push(i)
-            })
-            info.push(conn)
-            let g_query = 'SELECT groups.Name,groups.id,groupmembers.type FROM groups INNER JOIN groupmembers ON groups.id=groupmembers.groupid WHERE groupmembers.memberid = ? ORDER BY groups.Name ASC'
-            db.query(g_query, id, (err,res2) => {
-                if(res2.length) {
-                    res2.forEach(e => {
-                        i2 = {Name : e.Name, gid : e.id, type : e.type}
-                        gggg.push(i2)
-                    })
-                }
-                info.push(gggg)
-                callback(info)
-            })  
-            
-        })
-    },
-
     // get the names of the connected users
     names : (id, callback) => {
         let query = 'SELECT Name FROM users WHERE id=?'
@@ -413,12 +383,8 @@ User.prototype = {
     },
 
     // get the messages 
-    getRecentMsg : (room, callback) => {
-        let query = 'SELECT id,message,Time,Date FROM messages WHERE id=(SELECT MAX(id) FROM messages WHERE room=?)'
-        db.query(query,room,(err,res) => {
-            if(err) throw err
-            else callback(res)
-        })
+    getRecentMsg : (room) => {
+        let query = 'SELECT id,message,Time,Date FROM messages WHERE id=(SELECT MAX(id) FROM messages WHERE room = ?)'
     },
 
     // get all the messages for a particular user
@@ -454,5 +420,14 @@ User.prototype = {
     }
 
 }
+
+// to select the first 10 messages of a certain chat
+// SELECT * FROM messages WHERE room='2' AND id<(SELECT MAX(id) FROM messages WHERE room ='4+9')+1 ORDER BY id DESC LIMIT 10
+
+// to select the first 10 messages of a group chat with name and other details
+// SELECT messages.id ,messages.sent, users.Name, messages.message, messages.Time FROM users 
+// INNER JOIN messages ON users.id=messages.sent 
+// WHERE messages.room='2' AND messages.id<(SELECT MAX(id) FROM messages WHERE messages.room ='2')+1 
+// ORDER BY messages.id DESC LIMIT 10
 
 module.exports = User 

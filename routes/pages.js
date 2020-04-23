@@ -419,25 +419,16 @@ router.get('/chat', (req, res, next) => {
             info['groups'].forEach(e => rooms.push(e.id.toString()) )
             user.connections(req.session.user.id, (resultConn) => {
                 info.connections = resultConn
-                info.connections.forEach(e => rooms.push(req.session.user.id > e.id ? `${e.id}+${req.session.user.id}` : `${req.session.user.id}+${e.id}`))
-
+                info.connections.forEach(e => rooms.push(req.session.user.id > e.id ? `${e.id}+${req.session.user.id}` : `${req.session.user.id}+${e.id}`))              
                 res.render('chat_room', {
                     title : 'Chat Room',
                     user : req.session.user,
                     info : info
                 })
-
             })
         })
     }
     else res.redirect('/')
-})
-
-// get all the people connected to the person in the chat room
-router.get('/get_everything' , (req,res,next) => {
-    if(req.session.user)
-        user.get_everything(req.session.user.id , (result) => res.send(result))
-    else    res.redirect('/')
 })
 
 // request to post the group details into the database
