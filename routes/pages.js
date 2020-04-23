@@ -443,10 +443,8 @@ router.get('/get_everything' , (req,res,next) => {
 // request to post the group details into the database
 router.post('/create_group' , (req,res,next) => {
     members = req.body.members + req.session.user.id
-
-    user.create_group(req.body.name, members, (result) => {
-        res.send('ok')
-    })
+    
+    user.create_group(req.body.name, members, (result) => res.send(result))
 
 })
 

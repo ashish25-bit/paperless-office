@@ -72,7 +72,16 @@ io.on('connection', socket => {
     socket.on('added' , info => {
         user = findUserAll(info.id) 
         if(user != undefined)
-            io.to(user.sid).emit('addedGroup', {room:info.room})
+            io.to(user.sid).emit('group', {room:info.room})
+    })
+
+    // join the room for the new group 
+    // if the users is currently present in the chat room for opened in the chat page he/she will be added to the room
+    socket.on('joinRoomNewGroup' , info => {
+        user = findUserAll(info.id) 
+        if(user != undefined) 
+            io.to(user.sid).emit('group' , {room:info.room})
+        
     })
 })
 

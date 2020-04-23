@@ -15,6 +15,7 @@ let b_members = [] // this will contain the ids of the bidirectional users
 let gid // this will contain the group id of the current opened group
 let selected_ids = [] // this will contain the ids of the members who will be added to the group
 let currentChatRoom // this will contain the current chat room opened
+let acfg  = '' // allowed chats for groups
 const socket = io()
 
 {
@@ -31,7 +32,6 @@ const socket = io()
         .then((data) => {
             loggedName = data.name
             loggedIn = parseInt(data.id)
-            console.log(loggedIn)
             socket.emit('join' , loggedIn)
             // join the member to the chat rooms of the connections and the groups
             roomids = []
@@ -65,19 +65,13 @@ const socket = io()
                 success : (response) => {
                     if(response.length) {
                         c = {name : e.innerHTML , id : parseInt(e.getAttribute('data-connection-id'))}
+                        acfg += `<p class="chat_name chat_for_group" data-profile-id=${c.id}>${e.innerHTML}</p>`
                         b_members.push(c)
                     }
                 }
             })
         })
     }
-}
-
-// remove all the containers
-function display_none() {
-    chat_con.style.display  = 'none'
-    msg_con.style.display   = 'none'
-    group_con.style.display = 'none'
 }
 
 // to select the display people container
@@ -307,6 +301,105 @@ document.querySelector('.add_members').addEventListener('click' , () => {
 // for canceling the addtion of a new member
 document.querySelector('.cancel_add_mem').addEventListener('click' , () => add_mem_con.style.display = 'none' )
 
+// for creating groups
+document.querySelector('.create_group_chat').addEventListener('click' , () => {
+    document.querySelector('.container_msg_chats').style.display = 'none'
+    // re-initializing the selected_id to prevent the data mixing
+    selected_ids = []
+    gcc  = '<div class="select_group_chat_member">'
+    gcc += '<input class="group_name" placeholder="Enter group name">'
+    gcc += '<div class="con_can_con">'
+    gcc += '<button class="confirm_create_group">Create Group</button>'
+    gcc += '<button class="cancel_group">Cancel</button>'
+    gcc += '</div>'
+
+    gcc += acfg
+
+    gcc += '</div>'
+    $('.group_select').html(gcc)
+    menu_chat()
+
+    document.querySelectorAll('.chat_for_group').forEach(element => {
+        element.addEventListener('click' , () => {
+            id = parseInt(element.getAttribute('data-profile-id'))
+
+            if(!selected_ids.includes(id)) {
+                element.classList.add('chat_for_group_selected')
+                selected_ids.push(id)
+            }
+
+            else {
+                element.classList.remove('chat_for_group_selected')
+                ir = selected_ids.indexOf(id) // ir (immediately remove) 
+                selected_ids.splice(ir,1)
+            }
+        })        
+    })
+
+    document.querySelector('.cancel_group').addEventListener('click' , () => {
+        document.querySelector('.container_msg_chats').style.display = 'block'
+        $('.group_select').html('')
+        $('.pop_up_msg').html('')
+    })
+
+    document.querySelector('.confirm_create_group').addEventListener('click' , create_group)
+})
+
+function create_group() {
+    g_name = document.querySelector('.group_name')
+    if(g_name.value == '')
+        $('.pop_up_msg').html('Enter name of the group')
+    else if(selected_ids.length == 0)
+        $('.pop_up_msg').html('Select atleast one recepient')
+    else {
+        selected_ids.sort(function(a,b) {return a-b})
+        s = ''
+        selected_ids.forEach(element =>  s += element + ',' )
+        info = {
+            name : g_name.value,
+            members : s
+        }
+        
+        $.ajax({
+            url : '/create_group',
+            method : 'POST',
+            data : info,
+            success : response => {
+                // add the users into the room of the group 
+                r = []
+                room = response.insertId.toString()
+                r.push(room)
+                socket.emit('joinRoom' , r)
+                refreshGroups()
+                selected_ids.forEach(id => {
+                    socket.emit('added' , {id:id , room : room})
+                })
+            }
+        })
+    }
+}
+
+function refreshGroups() {
+    $.ajax({
+        url : '/refresh_groups',
+        method : 'GET',
+        success : response => {
+            r = ''
+            response.forEach(e => r += `<p class="group" data-group-id=${e.id}>${e.Name}</p>`)
+            $('.group_select').html('')
+            display_none()
+            document.querySelector('.container_msg_chats').style.display = 'block'
+            group_con.style.display = 'block'
+            group_con.innerHTML = r
+        }
+    })
+    .then(() => {
+        // re-initializing group variable
+        groups = document.querySelectorAll('.group')
+        groups.forEach(funGroup)
+    }) 
+}
+
 // to insert the message text-box for connections and groups
 function insertInputBox(name, type) {
     dd = document.createElement('div')
@@ -346,7 +439,7 @@ function appendMsg(msg, cls, type, name) {
     div.classList.add(cls)
     m = ''
     if(type == 'group') 
-        m += `<p>${name}</p><br/>`
+        m += `<p class="msg_name ${cls}_n">${name}</p><br/>`
     m  += `<p class="cm">${msg}</p><br/><p class="ct">${time}</p>`
     div.innerHTML = m
     let msg_con = document.querySelector(".chat_message")
@@ -371,25 +464,39 @@ function appendMsg2(messages, type) {
     })
 }
 
+// the menu button which will contain the options such as -> create group
+document.querySelector('.menu_chat_btn').addEventListener('click' , menu_chat)
+
+// displaying and hiding the menu option
+function menu_chat() {
+    menu_options.style.display == 'block' ? menu_options.style.display = 'none' : menu_options.style.display = 'block' 
+}
+
+// remove all the containers
+function display_none() {
+    chat_con.style.display  = 'none'
+    msg_con.style.display   = 'none'
+    group_con.style.display = 'none'
+}
+
 // get notified when you are added to the group
-socket.on('addedGroup' , info => {
+socket.on('group' , info => {
     $.ajax({
         url : '/refresh_groups',
         method : 'GET',
         success : response => {
             r = ''
-            response.forEach(e => r += `<p class="group" data-group-id=${e.id}>${e.Name}</p>` )
+            response.forEach(e => r += `<p class="group" data-group-id=${e.id}>${e.Name}</p>`)
             group_con.innerHTML = r
         }
     })
     .then(() => {
         // re-initializing group variable
-        groups = document.querySelectorAll('.group')
-        groups.forEach(funGroup)
         r = []
         r.push(info.room)
         socket.emit('joinRoom' , r)
-        socket.emit('showRoom')
+        groups = document.querySelectorAll('.group')
+        groups.forEach(funGroup)
     }) 
 })
 
