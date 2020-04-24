@@ -420,10 +420,19 @@ router.get('/chat', (req, res, next) => {
             user.connections(req.session.user.id, (resultConn) => {
                 info.connections = resultConn
                 info.connections.forEach(e => rooms.push(req.session.user.id > e.id ? `${e.id}+${req.session.user.id}` : `${req.session.user.id}+${e.id}`))              
-                res.render('chat_room', {
-                    title : 'Chat Room',
-                    user : req.session.user,
-                    info : info
+                msg = ''
+                rooms.forEach((e,i) => {
+                    msg += '(SELECT MAX(id) FROM messages WHERE room = ?)'
+                    if(i<rooms.length-1)
+                        msg += ','
+                })                
+                user.getRecentMsg(rooms, msg, (result) => {
+                    res.render('chat_room', {
+                        title : 'Chat Room',
+                        user : req.session.user,
+                        info : info,
+                        messages : result 
+                    })
                 })
             })
         })
@@ -546,14 +555,6 @@ router.post('/add_members' , (req,res,next) => {
     user.add_members(req.body , result => res.send(result)) 
 })
 
-// get the names
-router.get('/get_names' , (req,res,next) => {
-    if(req.session.user) {
-        user.names(req.query.id , (result) => res.send(result))
-    }
-    else    res.redirect('/')
-})
-
 // post the sent message into the database
 router.post('/put_message', (req,res,next) => {
     input = {
@@ -563,14 +564,6 @@ router.post('/put_message', (req,res,next) => {
         type : req.body.type
     }
     user.put_message(input, (result) => console.log(result))
-})
-
-// get request for getting the messages
-router.get('/get_messages' , (req,res,next) => {
-    if(req.session.user){
-        user.getRecentMsg(req.query.room, (result) => res.send(result))
-    }
-    else    res.redirect('/')
 })
 
 // get all the messages for a particular room

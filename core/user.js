@@ -357,15 +357,6 @@ User.prototype = {
         callback(true)    
     },
 
-    // get the names of the connected users
-    names : (id, callback) => {
-        let query = 'SELECT Name FROM users WHERE id=?'
-        db.query(query,id,(err,res) => {
-            if(err) throw err
-            callback(res)
-        })
-    },
-
     // put the message in the database
     put_message : (body, callback) => {
         let info = []
@@ -383,8 +374,12 @@ User.prototype = {
     },
 
     // get the messages 
-    getRecentMsg : (room) => {
-        let query = 'SELECT id,message,Time,Date FROM messages WHERE id=(SELECT MAX(id) FROM messages WHERE room = ?)'
+    getRecentMsg : (room, msg, callback) => {
+        let query = `SELECT id,message,Time,Date,room FROM messages WHERE id IN (${msg}) ORDER BY id DESC`
+        db.query(query, room, (err,res) => {
+            if(err) throw err
+            callback(res)
+        })
     },
 
     // get all the messages for a particular user
