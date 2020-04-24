@@ -415,7 +415,7 @@ router.get('/chat', (req, res, next) => {
     rooms = []
     if(req.session.user) {
         user.get_groups(req.session.user.id, (resultGroup) => {
-            info = {"groups" : resultGroup}
+            info.groups = resultGroup
             info['groups'].forEach(e => rooms.push(e.id.toString()) )
             user.connections(req.session.user.id, (resultConn) => {
                 info.connections = resultConn
@@ -427,6 +427,8 @@ router.get('/chat', (req, res, next) => {
                         msg += ','
                 })                
                 user.getRecentMsg(rooms, msg, (result) => {
+                    console.log(info)
+                    console.log(result)
                     res.render('chat_room', {
                         title : 'Chat Room',
                         user : req.session.user,

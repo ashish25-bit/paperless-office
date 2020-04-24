@@ -16,9 +16,9 @@ block content
                     if(messages.length)
                         -messages.forEach(message => {
                             if(message.room.includes('+'))
-                                -var index = info.connections.findIndex(conn => conn.id>user.id?`${user.id}+${conn.id}`:`${conn.id}+${user.id}` == message.room)
+                                -var index = info.connections.findIndex(conn => (conn.id>user.id?`${user.id}+${conn.id}`:`${conn.id}+${user.id}`) == message.room)
                                 if(index>=0)
-                                    div(class='msg_recent_con' chat data-room-id=`${message.room}`)
+                                    div(class='msg_recent_con' personal data-connection-id=info.connections[index].id data-room=message.room)
                                         p(class='msg_recent_name')= info.connections[index].Name
                                         p(class='msg_recent_date')= message.Date
                                         div(class='msg_recent_msg')= message.message
@@ -27,12 +27,14 @@ block content
                             else 
                                 -var index = info.groups.findIndex(g => g.id.toString() == message.room)
                                 if(index>=0)
-                                    div(class='msg_recent_con' group data-room-id=`${message.room}`)
+                                    div(class='msg_recent_con' group data-group-id=info.groups[index].id data-room=message.room)
                                         p(class='msg_recent_name')= info.groups[index].Name
                                         p(class='msg_recent_date')= message.Date
                                         div(class='msg_recent_msg')= message.message
                                         p(class='msg_recent_time')= message.Time
                         -})
+                    else 
+                        p No New Messages
                 .chats
                     if(info.connections.length)
                         -info.connections.forEach(conn => {

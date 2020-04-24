@@ -4,6 +4,7 @@ const group_con = document.querySelector('.groups')
 const msg_con = document.querySelector('.message')
 let chats = document.querySelectorAll('.chat_name')
 let groups = document.querySelectorAll('.group')
+let recent_msg = document.querySelectorAll('.msg_recent_con')
 const group_info = document.querySelector('.group_info')
 const add_mem_con = document.querySelector('.add_member_names_con')
 const add_member_button = document.querySelector('.add_mem_con')
@@ -16,6 +17,7 @@ let gid // this will contain the group id of the current opened group
 let selected_ids = [] // this will contain the ids of the members who will be added to the group
 let currentChatRoom // this will contain the current chat room opened
 let acfg  = '' // allowed chats for groups
+let month = ['January','February','March','April','May','June','July','August','September','October','November','December']
 const socket = io()
 
 {
@@ -92,6 +94,52 @@ document.querySelector('.msg_con_display').addEventListener('click' , () => {
     msg_con.style.display = 'block'
 })
 
+// to display the chat box for group or connection
+recent_msg.forEach(funcRecent)
+
+function funcRecent(e) {
+    e.addEventListener('click' , () => {
+        c = e.hasAttribute('group') ?  'group' : 'chat'
+        // for groups
+        if(c== 'group') {
+            groupInfoView()
+            add_member_button.style.display = 'none'
+            gid = e.getAttribute('data-group-id')
+            currentChatRoom = gid
+            insertInputBox(e.querySelector('.msg_recent_name').innerHTML,'group')
+            // for getting the group info con
+            document.querySelector('.group_info_btn').addEventListener('click', () => {
+                group_info.classList.toggle('groupInfoReveal')
+                group_info.classList.contains('groupInfoReveal') ? group_info.classList.remove('groupInfoHide') : group_info.classList.add('groupInfoHide')
+                // to get the group members as soon as the group info container is revealed
+                getGroupMembers(gid)
+            })
+            getChatMessages(gid, 'group')
+            messaging(gid,'group')
+        }
+        // for connections
+        else {
+            groupInfoView()
+            id = parseInt(e.getAttribute('data-connection-id'))
+            i = b_members.findIndex(member => member.id == id)
+            if(i>=0) {
+                insertInputBox(e.querySelector('.msg_recent_name').innerHTML,'connection')
+                room = id > loggedIn ? `${loggedIn}+${id}` : `${id}+${loggedIn}`
+                currentChatRoom = room
+                getChatMessages(room,'personal')
+                messaging(room,'personal')
+            }
+            else {
+                dd = document.createElement('div')
+                dd.innerHTML = '<p>You are not connected bidirectionally</p>'
+                if(messages.childNodes.length > 1) 
+                    messages.removeChild(messages.childNodes[1])
+                messages.appendChild(dd)
+            }
+        }
+    })
+}
+
 // to display the chat box with messages
 chats.forEach(e => {
     e.addEventListener('click' , () => {
@@ -153,9 +201,9 @@ function messaging(room,type) {
                 appendMsg(i.value , 'ques', type , 'You')
             }
             messageToDatabase(room,i.value,loggedIn,'text')
+            updateRecent(i.value, room, type)
         }
-        i.value = ''
-        i.focus()
+        
     })
 
     i.addEventListener('keyup' , e => {
@@ -170,7 +218,7 @@ function messaging(room,type) {
                     appendMsg(i.value , 'ques', type , 'You')
                 }
                 messageToDatabase(room,i.value,loggedIn,'text')
-                i.value = ''
+                updateRecent(i.value, room, type)
             }
         }
     })
@@ -494,6 +542,33 @@ function appendMsg2(messages, type) {
     })
 }
 
+// updating the recent message container
+function updateRecent(msg, room, attribute) {
+    i = document.querySelector('.msg_input')
+    if(i!=null){
+        i.value = ''
+        i.focus()
+    }
+    d = new Date()
+    date = `${month[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`
+    time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' , hour12 : 'false'}) 
+    let ii
+    for(i=0;i<recent_msg.length;i++) {
+        if(recent_msg[i].hasAttribute(attribute)) {
+            r = recent_msg[i].getAttribute('data-room')
+            if(r==room) {
+                ii = i
+                break
+            }
+        }
+    }
+    recent_msg[ii].querySelector('.msg_recent_date').innerText = date
+    recent_msg[ii].querySelector('.msg_recent_msg').innerText = msg
+    recent_msg[ii].querySelector('.msg_recent_time').innerText = time
+    node = msg_con.removeChild(recent_msg[ii])
+    msg_con.insertAdjacentElement("afterbegin",node)
+}
+
 // the menu button which will contain the options such as -> create group
 document.querySelector('.menu_chat_btn').addEventListener('click' , menu_chat)
 
@@ -534,10 +609,12 @@ socket.on('group' , info => {
 socket.on('message' , info => {
     if(info.room == currentChatRoom)
         appendMsg(info.msg,'ans','personal' , '')
+    updateRecent(info.msg, info.room,'personal')
 })
 
 // get the message for the group chat
 socket.on('messageGroup' , info => {
     if(info.room == currentChatRoom)
         appendMsg(info.msg,'ans','group',info.from)
+    updateRecent(info.msg, info.room,'group')
 })

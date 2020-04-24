@@ -866,6 +866,9 @@ textarea{
     position: relative;
     user-select: none;
 }
+.active_chat {
+    background: #eee;
+}
 .msg_recent_con:hover{
     background: #eee;
 }
