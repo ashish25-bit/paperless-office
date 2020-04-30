@@ -23,7 +23,7 @@ connect_status = []
                 p += '</div>'
                 id.push(element.id)
                 connect_status.push(0)
-                })
+            })
 
             $('.people_you_may_know_con').html(p)
             
@@ -81,7 +81,7 @@ connect_status = []
 
             profile.forEach((element,index) => {
                 element.addEventListener('click' , () => {
-                    location.replace('/profile=' + id[index])
+                    location.replace('/profile/' + id[index])
                 })
             })
         }
@@ -96,21 +96,19 @@ function getconn() {
         url : '/get_conn_noti',
         method : 'GET',
         success : (response) => {
-            if(response.length)
+            if(response.length) {
                 response.forEach(element => {
-                    res += `<p class="conName"><b class="c_name">${element.Name}</b> is now connected with you..</p>`
+                    res += `<p class="conName"><b class="c_name">${element.Name}</b> is now connected with you..</p>`    
                     conid.push(element.id)
                 })
+            }
             else 
                 res += '<p>No Connections made..</p>'
             $('.notification').html(res)
-            //console.log(conid)
             cid = document.querySelectorAll('.c_name')
 
-            cid.forEach((element,index) => {
-                element.addEventListener('click', () => location.replace('/profile=' + conid[index]))
-            })
-            
+            cid.forEach((element,index) => element.addEventListener('click', () => location.replace('/profile/' + conid[index])) )
+
         }
     })
 }

@@ -1,14 +1,19 @@
 const add_sign = document.querySelector('.add_sign')
 const pwd_con = document.querySelector('.pwd_con_sign')
 const pwd = document.querySelector('.sign_pwd')
-const  content = document.querySelector('.doc_content')
+const content = document.querySelector('.doc_content')
 const share = document.querySelector('.share_doc')
 const profile_photo = document.querySelectorAll('.profile_photo')
-let id_logged_user
+const edit = document.querySelector('.edit_dd')
+const save = document.querySelector('.save_content')
+let room
+const socket = io()
 
 {
     pwd_con.style.display = 'none'
     getDP()
+    room = share.getAttribute('data-doc-id')
+    socket.emit('joinDocRoom' , room)
 }
 
 // get details
@@ -17,7 +22,6 @@ function getDP(){
         url : '/get_details',
         method : 'GET',
         success : (response) => {
-            id_logged_user = response[0]['id']
             if(response[0]['DP'] == null)
                     profile_photo[0].src = '/uploads/download.png'
             else 
@@ -32,17 +36,22 @@ document.querySelector('.cancel_sign').addEventListener('click' , () => {
     $('.wrong_pwd').html('') 
 })
 
+save.addEventListener('click' , saveDoc)
 
-/*
-share.addEventListener('click', () =>{
-    preContent = document.createTextNode(content.innerHTML)
-    pre = document.createElement('pre')
-    content.innerHTML = ''
-    pre.append(preContent)
-    content.appendChild(pre)
-    content.setAttribute('contenteditable' , 'false')
-})
-*/
+function saveDoc() {
+    det = {
+        room : room,
+        content : content.innerHTML
+    }
+    $.ajax({
+        url : '/saveDoc',
+        method : 'POST',
+        data: det,
+        success : (response) => {
+            console.log(response)
+        }
+    })
+}
 
 document.querySelector('.fetch_sign').addEventListener('click' , () => {
     if(pwd.value == '')
@@ -58,17 +67,33 @@ document.querySelector('.fetch_sign').addEventListener('click' , () => {
                 else{
                     pwd_con.style.display = 'none'
                     img_src = `/signature/${response}`
-                    var div = document.createElement('div')
                     var img = document.createElement("img")
                     img.src = img_src
+                    img.setAttribute('contenteditable' , 'true')
                     img.classList.add('signed_img')
-                    div.setAttribute('contenteditable' , 'false')
-                    div.append(img)
-                    content.appendChild(div)
+                    content.appendChild(img)
                 }
             }
         })
     }
 })
 
-const socket = io()
+// edit document details
+if(edit!= null) {
+    edit.addEventListener('click' , () => {
+        
+    })
+}
+
+content.addEventListener('keyup' , event => {
+    if(event.key == 'Escape') {
+        event.preventDefault()
+        preContent = document.createTextNode(content.innerHTML)
+    }
+    else 
+        socket.emit('docContent',content.innerHTML) 
+        
+})
+
+// get the message 
+socket.on('message' , msg => content.innerHTML = msg)

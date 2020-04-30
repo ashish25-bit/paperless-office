@@ -5,7 +5,7 @@ html(lang="en")
        title= title
        <style>@import url('https://fonts.googleapis.com/css?family=Poppins&display=swap');</style>
        style
-            include includes/editor.css
+            include includes/style-route.css
     body
         .head
             include includes/header
@@ -15,12 +15,14 @@ html(lang="en")
 
         .edit_con            
             .share_add_btn_con
-                input(type="button", value="Save Content" class="save_content" title='Save your document edit it when the time suits you.')
+                input(type="button", value="Save Document" class='save_content' title='Save your edited document.')
                 input(type="button", value="Add Signature" class="add_sign" title='Add Your Signature in the document.')
-                input(type="button", value="Share Document" class="share_doc" title='Share this document as an editable file to your collegues.')
+                input(type="button", value="Share Document" class="share_doc" title='Share this document as an editable file to your collegues.' data-doc-id=document[0].id)
                 input(type="button", value="Save as pdf" class="save_pdf" title='Save your document as a document.')
+                if(user.Email == document[0].Email)
+                    input(type="button", value="Edit Doc Details" class="edit_dd" title='Change/Add document description, Change document password.')
 
-            div(contenteditable="true" class="doc_content")
+            div(contenteditable="true" class="doc_content")= document[0].Content
             
         .pwd_con_sign
             div

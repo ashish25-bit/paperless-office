@@ -4,7 +4,7 @@ const session = require('express-session')
 const pageRouter = require('./routes/pages')
 const socketio = require('socket.io') 
 const http = require('http')
-const {joinUser,removeUser,findUser,showRoom,userJoin,findUserAll} = require('./utils/users')
+const {joinUser,removeUser,findUser,showRoom,userJoin,findUserAll,joinDoc} = require('./utils/users')
 const User = require('./core/user') 
 
 const uu = new User()
@@ -83,6 +83,19 @@ io.on('connection', socket => {
             io.to(user.sid).emit('group' , {room:info.room})
         
     })
+
+    // add the people to the room the document editor
+    socket.on('joinDocRoom' , room => {
+        user = joinDoc(room,socket.id)
+        socket.join(user.room)
+    }) 
+
+    // real time document share.
+    socket.on('docContent' , msg => {
+        user = findUser(socket.id)
+        socket.broadcast.to(user.room).emit('message', msg)
+    })
+
 })
 
 // setting up the server

@@ -25,35 +25,28 @@ const socket = io()
     display_none()
     msg_con.style.display = 'block'
     add_member_button.style.display = 'none'
-
-    // get the id of the logged in user
-    fetch('/getid')
-        .then((resposne) => {
-            return resposne.json()
+        
+    loggedIn = parseInt(document.querySelector('.profile_photo').getAttribute('data-profile'))
+    loggedName = document.querySelector('.img_profile_con span').innerText
+    socket.emit('join' , loggedIn)
+    // join the member to the chat rooms of the connections and the groups
+    roomids = []
+    // getting the room of the groups
+    if(groups.length) {
+        groups.forEach(e => {
+            id = e.getAttribute('data-group-id').toString()
+            roomids.push(id)
         })
-        .then((data) => {
-            loggedName = data.name
-            loggedIn = parseInt(data.id)
-            socket.emit('join' , loggedIn)
-            // join the member to the chat rooms of the connections and the groups
-            roomids = []
-            // getting the room of the groups
-            if(groups.length) {
-                groups.forEach(e => {
-                    id = e.getAttribute('data-group-id').toString()
-                    roomids.push(id)
-                })
-            }
-            // getting the rooms for the connections
-            if(chats.length) {
-                chats.forEach(e => {
-                    id = e.getAttribute('data-connection-id')
-                    roomids.push(id>loggedIn?`${loggedIn}+${id}`:`${id}+${loggedIn}`)
-                })
-            }
-            socket.emit('joinRoom' , roomids)
-            // socket.emit('showRoom')
+    }
+    // getting the rooms for the connections
+    if(chats.length) {
+        chats.forEach(e => {
+            id = e.getAttribute('data-connection-id')
+            roomids.push(id>loggedIn?`${loggedIn}+${id}`:`${id}+${loggedIn}`)
         })
+    }
+    socket.emit('joinRoom' , roomids)
+    socket.emit('showRoom')
 
     
     // get the data of the birectionally connected users
@@ -267,11 +260,11 @@ function getGroupMembers(id) {
                     }
                 }
                 else if(element.type == 'admin') {
-                    gm += `<div class="gm-name"><p data-profile-id='${element.id}'><a href="/profile:${element.id}">${element.Name}</a></p>`
+                    gm += `<div class="gm-name"><p data-profile-id='${element.id}'><a href="/profile/${element.id}">${element.Name}</a></p>`
                     gm += `<span>Admin</span>`
                 }
                 else {
-                    gm += `<div class="gm-name"><p data-profile-id='${element.id}'><a href="/profile:${element.id}">${element.Name}</a></p>`
+                    gm += `<div class="gm-name"><p data-profile-id='${element.id}'><a href="/profile/${element.id}">${element.Name}</a></p>`
                     if(makeAdmin)
                         gm += `<button class='make_admin_btn' data-profile-id='${element.id}'>Make Admin</button>`
                 }

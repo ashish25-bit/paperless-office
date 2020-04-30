@@ -1,16 +1,28 @@
-block content
-    include lay_head
+doctype html
+html(lang="en")
+    head
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       title= title
+       <style>@import url('https://fonts.googleapis.com/css?family=Poppins&display=swap');</style>
+       style
+            include includes/style-route.css
+    body
+        .head
+            include includes/header
+            block content
 
-    p= person[0].Name
-    p= person[0].Email
-    p= person[0].Company
-    p= person[0].Position
-    p Connections :  
-        span= person[0].connections
-    img(src="uploads/" + img width='200px')
-    div
-        a(href="/profile=" + person[0].id class="profile_id")= 'localhost:3000/profile=' + person[0].id
-    button(class='connect_btn') Connect
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+        
+        p= person[0].Name
+        p= person[0].Email
+        p= person[0].Company
+        p= person[0].Position
+        p Connections :
+            span= person[0].connections
+        img(src="uploads/" + img width='200px')
+        div 
+            a(href="/profile/" + person[0].id class="profile_id")= 'localhost:3000/profile/' + person[0].id
+        button(class='connect_btn') Connect
 
-    script
-        include includes/someProfile.js
+        script
+            include includes/someProfile.js

@@ -288,13 +288,22 @@ User.prototype = {
         
     },
 
-    // find the document the user has requested for
-    findDoc: (id, email, callback) => {
+    // saves the changes made in the document
+    saveDoc : (id, content, callback) => {
         det = []
+        det.push(content)
         det.push(id)
-        det.push(email)
-        let query = 'SELECT * FROM documents WHERE id = ? AND Email = ?'
-        db.query(query,det,(err,result) => {
+        let query = 'UPDATE documents SET Content = ? WHERE id = ?'
+        db.query(query,det,(err,res) => {
+            if(err) throw err
+            callback(res)
+        })
+    },
+
+    // find the document the user has requested for
+    findDoc: (id, callback) => {
+        let query = 'SELECT * FROM documents WHERE id = ?'
+        db.query(query,id,(err,result) => {
             if(err) throw err
             callback(result)
         })

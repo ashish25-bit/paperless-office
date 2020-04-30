@@ -11,7 +11,7 @@ const bcrypt = require('bcryptjs')
 const app = express()
 //server static files
 app.use(express.static(path.join(__dirname, 'public')))
-//app.use(express.static('./public'))
+app.set('views' , path.join(__dirname, 'views'))
 const user = new User()
 app.use(bodyParser.urlencoded({extended : true}))
 
@@ -49,7 +49,7 @@ router.post('/' , (req,res,next) => {
             else if(result.Sign === null)
                 res.redirect('/remove')
             else 
-                res.redirect('/chat')
+                res.redirect('/home')
         }
         else{
             res.render('index' ,{
@@ -312,7 +312,6 @@ router.post('/update_pwd' , (req, res, next) => {
     }
     else 
         res.send('Password Entered is not correct')  
-
 })
 
 // request for getting details
@@ -344,13 +343,11 @@ router.get('/people_you_may_know' , (req,res,next) => {
 })
 
 // get profile of a particular person
-router.get('/profile:id' , (req,res,next) => {
-    if(req.session.user){
-        let id_ = req.params.id
-        id = id_.substring(1)
-        id = parseInt(id)
-        user.get_details(id, function(result) {
-            if(result){
+router.get('/profile/:id' , (req,res,next) => {
+    if(req.session.user) {
+        let id = req.params.id
+        user.get_details(id, (result) => {
+            if(result.length) {
                 img = result[0].DP == null ? 'download.png' : result[0].DP
                 res.render('Profile' , {
                     title : result[0].Name + "'s Profile",
@@ -360,11 +357,9 @@ router.get('/profile:id' , (req,res,next) => {
                 })
             }
             else 
-                console.log('There was an error')
+                res.send('Not Found')
         })
     }
-    else 
-        res.redirect('/')   
 })
 
 // request to connect
@@ -427,8 +422,6 @@ router.get('/chat', (req, res, next) => {
                         msg += ','
                 })                
                 user.getRecentMsg(rooms, msg, (result) => {
-                    console.log(info)
-                    console.log(result)
                     res.render('chat_room', {
                         title : 'Chat Room',
                         user : req.session.user,
@@ -496,18 +489,27 @@ router.post('/docs' , (req,res,next) => {
     })
 })
 
+// save the changes in the document
+router.post('/saveDoc' , (req,res,next) => {
+    console.log(req.body)
+    user.saveDoc(req.body.room, req.body.content, (result) => res.send(result))
+})
+
 // request to get the editor
-router.get(`/editor/:email/:id` , (req,res,next) => {
+router.get(`/editor/:name/:id` , (req,res,next) => {
     if(req.session.user) {
-        email = req.params.email
+        name = req.params.name
         id = req.params.id
-        user.findDoc(id,email, (result) => {
-            if(result.length){
-                res.render('editor' , {
-                    title : 'Editor - PaperLess Office',
-                    user : req.session.user,
-                    document : result
-                })
+        user.findDoc(id, (result) => {
+            if(result.length){ 
+                if(result[0].Name == name) {
+                    res.render('editor' , {
+                        title : `${name} - Editor`,
+                        user : req.session.user,
+                        document : result
+                    })
+                }
+                else res.send('document not found')
             }
             else
                 res.send('document not found')

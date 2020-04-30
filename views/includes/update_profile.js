@@ -45,12 +45,11 @@ function display_none(){
 }
 
 input.onkeyup = function(e) {
-	lastKeyUp = e.timeStamp;
-	if (e.timeStamp - lastKeyUp > delay) {
+    lastKeyUp = e.timeStamp
+	if (e.timeStamp - lastKeyUp > delay) 
 		doSearch()
-	} else {
+	else 
 		cb = setTimeout(doSearch, delay)
-    }
 }
 
 function doSearch() {

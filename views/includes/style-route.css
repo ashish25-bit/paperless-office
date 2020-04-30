@@ -92,6 +92,8 @@ input[type=submit],button,input[type=button]{
     overflow-y: auto;
     border: 1px #ddd solid;
     padding: 20px;
+    position: relative;
+    word-break: break-word;
 }
 
 .share_add_btn_con{
@@ -176,4 +178,13 @@ input[type=submit],button,input[type=button]{
 .wrong_pwd{
     text-align: center;
     color: red;
+}
+
+.connect_btn{
+    padding: 10px;
+    border: none;
+    color: white;
+    background: #1821a3;
+    outline: none;
+    margin-top: 10px;
 }
