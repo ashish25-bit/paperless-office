@@ -14,7 +14,10 @@ input[type=submit],button,input[type=button]{
 textarea{
     resize: none;
 }
-
+button, input, textarea {
+    outline: none;
+}
+ 
 /* header styling common to many pages */
 .head{
     background: #4CBB86;
@@ -1160,4 +1163,58 @@ textarea{
 .wrong_pwd{
     text-align: center;
     color: red;
+}
+
+.share_chats_con {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.share_chats_con .groups {
+    display: none;
+}
+.share_chats_con .groups, .share_chats_con .people {
+    text-align: left;
+    background: white;
+    width: 340px;
+}
+.btn_con {
+    background: #4CBB86;
+    width: 340px;
+    padding: 10px 0; 
+}
+.btn_con button {
+    padding: 5px 6px;
+    border: none;
+    background: #36827D;
+    margin: 0 5px;
+    color: #fff;
+}
+.share_chats_con .groups div, .share_chats_con .people div {
+    padding: 20px 10px;
+    border-bottom: 1px solid #ccc;
+}
+.share_chats_con .cancel, .share_chats_con .send {
+    width: 170px;
+    padding: 10px 0;
+    border: none;
+    color: white;
+    background: #36827d;
+}
+.share_chats_con .cancel {
+    border-right: 1px solid #fff;
+}
+.share_chats_con .send {
+    border-left: 1px solid #fff;
+}
+.share_chats_con .disabled {
+    opacity: 0.5;
 }

@@ -208,7 +208,10 @@ User.prototype = {
     },
 
     new_conn : (id, callback) => {
-        let query = 'SELECT users.Name,users.id FROM users INNER JOIN connections ON users.id=connections.shepard WHERE connections.master = ? ORDER BY connections.id DESC '
+        let query = `SELECT users.Name,users.id FROM users 
+                    INNER JOIN connections ON users.id=connections.shepard 
+                    WHERE connections.master = ? 
+                    ORDER BY connections.id DESC`
 
         db.query(query, id, (err,res) => {
             if(err) throw err
@@ -252,7 +255,10 @@ User.prototype = {
     },
 
     get_groups : (id, callback) => {
-        let query = 'SELECT groups.id, groups.Name FROM groups INNER JOIN groupmembers ON groups.id=groupmembers.groupid WHERE groupmembers.memberid = ? ORDER BY groups.Name ASC'
+        let query = `SELECT groups.id, groups.Name FROM groups 
+                     INNER JOIN groupmembers ON groups.id=groupmembers.groupid 
+                     WHERE groupmembers.memberid = ? 
+                     ORDER BY groups.Name ASC`
         db.query(query,id, (err,res) => {
             if(err) throw err
             callback(res)
@@ -337,7 +343,11 @@ User.prototype = {
 
     // for getting the members of a group
     getMembers : (id, callback) => {
-        let query = 'SELECT users.Name, users.id, groupmembers.type FROM users INNER JOIN groupmembers ON users.id=groupmembers.memberid WHERE groupmembers.groupid = ? ORDER BY groupmembers.type ASC'
+        let query = `SELECT users.Name, users.id, groupmembers.type FROM users 
+                     INNER JOIN groupmembers ON users.id=groupmembers.memberid 
+                     WHERE groupmembers.groupid = ? 
+                     ORDER BY groupmembers.type ASC`
+
         db.query(query,id, (err,result) => {
             if(err) throw err
             callback(result)
@@ -401,7 +411,10 @@ User.prototype = {
 
     // get all the messages for a particular user
     get_all_messages : (id, callback) => {
-        let query = 'SELECT users.Name, messages.message, messages.Time, messages.sent FROM users INNER JOIN messages ON users.id=messages.sent WHERE messages.room = ? ORDER BY messages.id ASC'
+        let query = `SELECT users.Name, messages.message, messages.Time, messages.sent FROM users 
+                     INNER JOIN messages ON users.id=messages.sent 
+                     WHERE messages.room = ? 
+                     ORDER BY messages.id ASC`
 
         db.query(query, id, (err,res) => {
             if(err) throw err
@@ -411,7 +424,11 @@ User.prototype = {
 
     // to get all the connections of the logged in user
     connections : (id, callback) => {
-        let query = 'SELECT users.id, users.Name FROM users INNER JOIN connections ON users.id=connections.master WHERE shepard=? ORDER BY users.Name ASC'
+        let query = `SELECT users.id, users.Name FROM users 
+                     INNER JOIN connections ON users.id=connections.master 
+                     WHERE shepard=? 
+                     ORDER BY users.Name ASC`
+
         db.query(query, id, (err,res) => {
             if(err) throw err
             callback(res)
@@ -426,6 +443,27 @@ User.prototype = {
 
         let query = 'SELECT id FROM connections WHERE master=? AND shepard=?'
         db.query(query, ids, (err,res) => {
+            if(err) throw err
+            callback(res)
+        })
+    },
+
+    // get all the users connected bidirectionally to the user requested this 
+    getusers: (id, callback) => {
+        let det = []
+        det.push(id)
+        det.push(id)
+        let query = `SELECT users.Name, users.id FROM users 
+                     LEFT JOIN connections ON 
+                     users.id=connections.master 
+                     WHERE connections.shepard=?
+                    INTERSECT 
+                    SELECT users.Name, users.id FROM users 
+                     RIGHT JOIN connections ON 
+                     users.id=connections.shepard 
+                     WHERE connections.master=?`
+
+        db.query(query, det, (err,res) => {
             if(err) throw err
             callback(res)
         })

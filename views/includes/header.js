@@ -1,6 +1,8 @@
 const profile_photo = document.querySelectorAll('.profile_photo')
 let id_logged_user
 
+let username_logged = document.querySelector('.img_profile_con span').innerText
+
 {
         getDP()
 }

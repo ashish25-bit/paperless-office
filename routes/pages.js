@@ -49,7 +49,7 @@ router.post('/', (req, res, next) => {
             else if (result.Sign === null)
                 res.redirect('/remove')
             else
-                res.redirect('/home')
+                res.redirect('/editor/Sample-1/1')
         }
         else {
             res.render('index', {
@@ -593,6 +593,26 @@ router.get('/refresh_groups', (req, res, next) => {
     if (req.session.user) {
         user.get_groups(req.session.user.id, result => res.send(result))
     }
+})
+
+// get all the groups and the birdirectionally connected members
+router.get('/getusers', (req, res, next) => {
+    let info = { groups: [], connection: [] }
+    user.getusers(req.session.user.id, result1 => {
+        info.connection = result1
+        user.get_groups(req.session.user.id, result2 => {
+            info.groups = result2
+            res.send(info)
+        })
+    }) 
+})
+
+// put the send document msg into the database
+router.post('/d_message', (req, res, next) => {
+    const { entry, questionsMarks } = req.body
+    console.log(entry)
+    console.log(questionsMarks)
+    res.send('tis working')
 })
 
 module.exports = router

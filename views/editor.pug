@@ -18,6 +18,18 @@ block content
             input(type="button", value="Fetch Signature" class="fetch_sign")
             input(type="button", value="Cancel" class="cancel_sign")
 
+    .share_chats_con
+        .btn_con
+            button.people_btn People
+            button.group_btn Groups
+        .people
+        .groups
+
+        div
+            button.cancel Cancel
+            button(class='send disabled' disabled) Send
+        
+
 
     script(src="/socket.io/socket.io.js")
     script

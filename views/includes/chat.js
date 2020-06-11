@@ -8,7 +8,10 @@ let recent_msg = document.querySelectorAll('.msg_recent_con')
 const group_info = document.querySelector('.group_info')
 const add_mem_con = document.querySelector('.add_member_names_con')
 const add_member_button = document.querySelector('.add_mem_con')
-let input_box = '<div class="msg_input_box_con"><textarea type="text" name="message" class="msg_input" placeholder="Your message..." ></textarea><button class="msg_send_btn">Send</button></div>'
+let input_box = `<div class="msg_input_box_con">
+                    <textarea type="text" name="message" class="msg_input" placeholder="Your message..." ></textarea>
+                    <button class="msg_send_btn">Send</button>
+                </div>`
 const messages = document.querySelector('.messages')
 let loggedIn // this will contain the id of the current logged in user
 let loggedName // this will contain the name of the current logged in user
@@ -186,11 +189,11 @@ function messaging(room, type) {
     send.addEventListener('click', () => {
         if (i.value != '') {
             if (type == 'personal') {
-                socket.emit('sendmsg', { msg: i.value, room: room })
+                socket.emit('sendmsg', { msg: i.value, room: room, type: 'text' })
                 appendMsg(i.value, 'ques', type, '')
             }
             if (type == 'group') {
-                socket.emit('sendGroupmsg', { msg: i.value, room: room, name: loggedName })
+                socket.emit('sendGroupmsg', { msg: i.value, room: room, name: loggedName, type: 'text' })
                 appendMsg(i.value, 'ques', type, 'You')
             }
             messageToDatabase(room, i.value, loggedIn, 'text')
@@ -204,11 +207,11 @@ function messaging(room, type) {
             if (i.value != '') {
                 console.log(i.value)
                 if (type == 'personal') {
-                    socket.emit('sendmsg', { msg: i.value, room: room })
+                    socket.emit('sendmsg', { msg: i.value, room: room, type: 'text' })
                     appendMsg(i.value, 'ques', type, '')
                 }
                 if (type == 'group') {
-                    socket.emit('sendGroupmsg', { msg: i.value, room: room, name: loggedName })
+                    socket.emit('sendGroupmsg', { msg: i.value, room: room, name: loggedName, type: 'text' })
                     appendMsg(i.value, 'ques', type, 'You')
                 }
                 messageToDatabase(room, i.value, loggedIn, 'text')
