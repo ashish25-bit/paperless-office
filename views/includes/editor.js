@@ -3,7 +3,6 @@ const pwd_con = document.querySelector('.pwd_con_sign')
 const pwd = document.querySelector('.sign_pwd')
 const content = document.querySelector('.doc_content')
 const share = document.querySelector('.share_doc')
-const profile_photo = document.querySelectorAll('.profile_photo')
 const edit = document.querySelector('.edit_dd')
 const save = document.querySelector('.save_content')
 let room
@@ -11,21 +10,14 @@ const socket = io()
 
 {
     pwd_con.style.display = 'none'
-    getDP()
     room = share.getAttribute('data-doc-id')
     socket.emit('joinDocRoom' , room)
-}
-
-// get details
-function getDP(){
     $.ajax({
-        url : '/get_details',
+        url : '/get/document/content',
         method : 'GET',
+        data: { id: room },
         success : (response) => {
-            if(response[0]['DP'] == null)
-                    profile_photo[0].src = '/uploads/download.png'
-            else 
-                    profile_photo[0].src = '/uploads/' + response[0]['DP']
+            content.innerHTML = response[0].Content
         }
     })
 }

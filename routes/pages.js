@@ -11,89 +11,89 @@ const bcrypt = require('bcryptjs')
 const app = express()
 //server static files
 app.use(express.static(path.join(__dirname, 'public')))
-app.set('views' , path.join(__dirname, 'views'))
+app.set('views', path.join(__dirname, 'views'))
 const user = new User()
-app.use(bodyParser.urlencoded({extended : true}))
+app.use(bodyParser.urlencoded({ extended: true }))
 
 
 // get index page
-router.get('/' , (req,res,next) => {
+router.get('/', (req, res, next) => {
     let user = req.session.user
-    if(user){
+    if (user) {
         res.redirect('/home')
         return
     }
-    res.render('index' ,{
-        title : 'Login',
+    res.render('index', {
+        title: 'Login',
         error: ''
     })
 })
 
 //logout request
-router.get('/logout' , (req,res,next) => {
-    if(req.session.user){
+router.get('/logout', (req, res, next) => {
+    if (req.session.user) {
         req.session.destroy(() => res.redirect('/'))
     }
-    else 
+    else
         res.redirect('/')
 })
 
 // post login data
-router.post('/' , (req,res,next) => {
-    user.login(req.body.email, req.body.password, function(result) {
-        if(result) {
+router.post('/', (req, res, next) => {
+    user.login(req.body.email, req.body.password, function (result) {
+        if (result) {
             req.session.user = result
 
-            if(result.Company === null)
+            if (result.Company === null)
                 res.redirect('/setup')
-            else if(result.Sign === null)
+            else if (result.Sign === null)
                 res.redirect('/remove')
-            else 
+            else
                 res.redirect('/home')
         }
-        else{
-            res.render('index' ,{
-                title : 'Login',
-                error : 'Incorrect Email or Password'
+        else {
+            res.render('index', {
+                title: 'Login',
+                error: 'Incorrect Email or Password'
             })
         }
     })
 })
 
 //set up the home page
-router.get('/home' , (req,res,next) => {
-    if(req.session.user){
-        if(req.session.user.Company == null)
-        res.redirect('/setup')
+router.get('/home', (req, res, next) => {
+    if (req.session.user) {
+        if (req.session.user.Company == null)
+            res.redirect('/setup')
         else {
             res.render('home', {
-                title : 'Home',
-                user : req.session.user
+                title: 'Home',
+                user: req.session.user
             })
         }
     }
     else
-        res.redirect('/')    
+        res.redirect('/')
 })
 
 // post signup data
-router.post('/signup' , (req,res,next) => {
+router.post('/signup', (req, res, next) => {
     let userInput = {
-        name : req.body.name,
-        email : req.body.email,
-        password : req.body.password
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password
     }
 
-    user.create(userInput, function(lastId) {
-        if(lastId){
+    user.create(userInput, function (lastId) {
+        if (lastId) {
             user.find(lastId, (result) => {
                 req.session.user = result
                 res.redirect('/setup.pug')
             })
         }
-        else{
+        else {
             res.render('index', {
-                title : 'Login',
+                title: 'Login',
                 error: 'User Already Exists'
             })
         }
@@ -101,64 +101,64 @@ router.post('/signup' , (req,res,next) => {
 })
 
 // get setup page
-router.get('/setup', (req,res,next) => {
+router.get('/setup', (req, res, next) => {
     let user = req.session.user
-    if(user){
-        if(user.Company == null){
+    if (user) {
+        if (user.Company == null) {
             n = user.Name
             name = n.split(" ")
-            res.render('setup' , {
-                title : 'Setup',
-                name : 'Welcome, ' + name[0],
-                user : user
+            res.render('setup', {
+                title: 'Setup',
+                name: 'Welcome, ' + name[0],
+                user: user
             })
             return
         }
-        else{
+        else {
             res.redirect('/home')
         }
     }
-    else 
+    else
         res.redirect('/')
 })
 
 // set storage engine for profile
 const storage = multer.diskStorage({
-    destination : './public/uploads',
-    filename : function(req,file,callback){
-        callback(null,Date.now() + path.extname(file.originalname))
+    destination: './public/uploads',
+    filename: function (req, file, callback) {
+        callback(null, Date.now() + path.extname(file.originalname))
     }
 })
 
 //init upload for profile
 const upload = multer({
-    storage : storage,
-    fileFilter : function(req,file,callback){
+    storage: storage,
+    fileFilter: function (req, file, callback) {
         checkFileType(file, callback)
     }
 }).single('profile_image')
 
 
 //post request to store the profile photo
-router.post('/upload' , (req,res,next) => {
+router.post('/upload', (req, res, next) => {
     u = req.session.user
-    upload(req,res,(err) => {
-        if(err){
-            res.render('setup' , {
-                msg : err
+    upload(req, res, (err) => {
+        if (err) {
+            res.render('setup', {
+                msg: err
             })
         }
-        else{
-            if(req.file != undefined)
+        else {
+            if (req.file != undefined)
                 console.log("File Uploaded")
-            else 
+            else
                 console.log('No file selected')
         }
 
-        user.information(u.id,req.body.company,req.body.position,req.file , function(result){
-            if(result)
+        user.information(u.id, req.body.company, req.body.position, req.file, function (result) {
+            if (result)
                 res.redirect('/remove.pug')
-            else 
+            else
                 console.log('There was an error')
         })
     })
@@ -166,34 +166,34 @@ router.post('/upload' , (req,res,next) => {
 
 // storage engine for signature
 const storage_sign = multer.diskStorage({
-    destination : './public/signature',
-    filename : function(req,file,callback){
-        callback(null,Date.now() + path.extname(file.originalname))
+    destination: './public/signature',
+    filename: function (req, file, callback) {
+        callback(null, Date.now() + path.extname(file.originalname))
     }
 })
 
 //init upload for signature
 const upload_sign = multer({
-    storage : storage_sign,
-    fileFilter : function(req,file,callback){
+    storage: storage_sign,
+    fileFilter: function (req, file, callback) {
         checkFileType(file, callback)
     }
 }).single('sign')
 
 // get remove background page
-router.get('/remove' , (req,res,next) => {
+router.get('/remove', (req, res, next) => {
     let user = req.session.user
-    if(user){
-        if(user.Sign == null) {
+    if (user) {
+        if (user.Sign == null) {
             n = user.Name
             name = n.split(" ")
-            res.render('remove',{
-                title : 'Remove',
-                name : 'Welcome ' + name[0]
+            res.render('remove', {
+                title: 'Remove',
+                name: 'Welcome ' + name[0]
             })
             return
         }
-        else 
+        else
             res.redirect('/home')
     }
     else
@@ -201,28 +201,28 @@ router.get('/remove' , (req,res,next) => {
 })
 
 //post request for signature
-router.post('/remove_bg' , (req,res,next) => {
-    upload_sign(req,res,(err) => {
-        if(err)
+router.post('/remove_bg', (req, res, next) => {
+    upload_sign(req, res, (err) => {
+        if (err)
             console.log(err)
-        else{
+        else {
             img_name = remove_bg(req.file)
             id = req.session.user.id
-            user.signUpload(id,img_name, function(result){
-                if(result){
+            user.signUpload(id, img_name, function (result) {
+                if (result) {
                     res.redirect('/home')
                 }
                 else
                     console.log('There was an error')
             })
-            
+
         }
     })
-    
+
 })
 
 // API call to remove background of the signature
-function remove_bg(file){
+function remove_bg(file) {
     const localFile = './' + file.path
     img_name = Date.now() + '.png'
     const outputFile = './public/signature/' + img_name
@@ -233,108 +233,108 @@ function remove_bg(file){
         size: "regular",
         type: "auto",
         scale: "50%",
-        outputFile 
+        outputFile
     })
     fs.unlinkSync(localFile)
     return img_name
 }
 
 //check file type function for profile photo
-function checkFileType(file,cb){
+function checkFileType(file, cb) {
     const filetypes = /jpeg|jpg|png/
     const ext = filetypes.test(path.extname(file.originalname).toLowerCase())
     const mimetype = filetypes.test(file.mimetype)
 
-    if(mimetype && ext)
-        return cb(null,true)
+    if (mimetype && ext)
+        return cb(null, true)
     else
         cb('Error : Images Only!')
 }
 
 //set up profile page
-router.get('/profile' , (req,res,next) => {
-    if(req.session.user){
-        res.render('profile' , {
+router.get('/profile', (req, res, next) => {
+    if (req.session.user) {
+        res.render('profile', {
             title: 'Profile',
-            user : req.session.user
-        })
-    }
-    else 
-        res.redirect('/')    
-})
-
-// get profile update page
-router.get('/update_profile' , (req,res,next) => {
-    if(req.session.user){
-        res.render('update_profile' , {
-            title : 'Update Profile', 
-            user : req.session.user
+            user: req.session.user
         })
     }
     else
-        res.redirect('/')    
+        res.redirect('/')
+})
+
+// get profile update page
+router.get('/update_profile', (req, res, next) => {
+    if (req.session.user) {
+        res.render('update_profile', {
+            title: 'Update Profile',
+            user: req.session.user
+        })
+    }
+    else
+        res.redirect('/')
 })
 
 // request for updating details
-router.post('/update_details' , (req,res,next) => {
+router.post('/update_details', (req, res, next) => {
     det = {
-        company : req.body.company,
-        position : req.body.position,
-        id : req.session.user.id
+        company: req.body.company,
+        position: req.body.position,
+        id: req.session.user.id
     }
-    
-    user.update_det(det, function(result){
-        if(result)
+
+    user.update_det(det, function (result) {
+        if (result)
             res.send('Details Updated')
-        else 
+        else
             res.send('Failed to update details')
     })
 })
 
 // request for updating password
-router.post('/update_pwd' , (req, res, next) => {
-    new_pwd = bcrypt.hashSync(req.body.pwd , 10)
+router.post('/update_pwd', (req, res, next) => {
+    new_pwd = bcrypt.hashSync(req.body.pwd, 10)
     pwd = req.session.user.Password
     old_pwd = req.body.old
 
     pass = {
-        password : new_pwd,
-        id : req.session.user.id
+        password: new_pwd,
+        id: req.session.user.id
     }
 
-    if(bcrypt.compareSync(old_pwd, pwd)) {
-        user.update_password(pass, function(result){
-            if(result)
+    if (bcrypt.compareSync(old_pwd, pwd)) {
+        user.update_password(pass, function (result) {
+            if (result)
                 res.send('Password Updated')
             else
                 res.send('There was an error')
         })
     }
-    else 
-        res.send('Password Entered is not correct')  
+    else
+        res.send('Password Entered is not correct')
 })
 
 // request for getting details
-router.get('/get_details' , (req,res,next) => {
-    if(req.session.user){
-        user.get_details(req.session.user.id , function(result) {
-            if(result)
+router.get('/get_details', (req, res, next) => {
+    if (req.session.user) {
+        user.get_details(req.session.user.id, function (result) {
+            if (result)
                 res.send(result)
             else
                 res.send('No data is found')
         })
     }
-    else 
+    else
         res.redirect('/')
 })
 
 // request for people you may know
-router.get('/people_you_may_know' , (req,res,next) => {
-    if(req.session.user){
-        user.people(req.session.user.Company, req.session.user.id, function(result) {
-            if(result)
+router.get('/people_you_may_know', (req, res, next) => {
+    if (req.session.user) {
+        user.people(req.session.user.Company, req.session.user.id, function (result) {
+            if (result)
                 res.send(result)
-            else 
+            else
                 res.send('No Users')
         })
     }
@@ -343,62 +343,62 @@ router.get('/people_you_may_know' , (req,res,next) => {
 })
 
 // get profile of a particular person
-router.get('/profile/:id' , (req,res,next) => {
-    if(req.session.user) {
+router.get('/profile/:id', (req, res, next) => {
+    if (req.session.user) {
         let id = req.params.id
         user.get_details(id, (result) => {
-            if(result.length) {
+            if (result.length) {
                 img = result[0].DP == null ? 'download.png' : result[0].DP
-                res.render('Profile' , {
-                    title : result[0].Name + "'s Profile",
-                    user : req.session.user,
-                    person : result,
-                    img : img
+                res.render('Profile', {
+                    title: result[0].Name + "'s Profile",
+                    user: req.session.user,
+                    person: result,
+                    img: img
                 })
             }
-            else 
+            else
                 res.send('Not Found')
         })
     }
 })
 
 // request to connect
-router.post('/connect' , (req,res,next) => {
+router.post('/connect', (req, res, next) => {
     shepard = req.session.user.id
     master = req.body.master
-    user.connect(shepard, master, (result) => result ? res.send('connected') : res.send('There was an error connecting') )
+    user.connect(shepard, master, (result) => result ? res.send('connected') : res.send('There was an error connecting'))
 })
 
 // request for getting all connections
-router.get('/get_connections/:id' , (req,res,next) => {
-    if(req.session.user){
+router.get('/get_connections/:id', (req, res, next) => {
+    if (req.session.user) {
         id = req.params.id
         user.getallconnections(id, (result) => {
             res.send(result)
         })
     }
-    else res.redirect('/')    
-}) 
+    else res.redirect('/')
+})
 
 // request to get connection between 2 specific people
-router.get('/get_connection' , (req,res,next) => {
-    if(req.session.user){
+router.get('/get_connection', (req, res, next) => {
+    if (req.session.user) {
         shepard = req.session.user.id
         master = req.query.master
         user.getAconnections(shepard, master, (result) => {
             res.send(result)
         })
     }
-    else 
+    else
         res.redirect('/')
 })
 
 // request for disconnecting between connections
-router.get('/disconnect' , (req,res,next) =>{
-    if(req.session.user){
+router.get('/disconnect', (req, res, next) => {
+    if (req.session.user) {
         master = req.query.master
         shepard = req.session.user.id
-        user.disconnect(shepard, master, (result) => result ? res.send('Disconnected successfully') : res.send('There was an error disconnecting') )
+        user.disconnect(shepard, master, (result) => result ? res.send('Disconnected successfully') : res.send('There was an error disconnecting'))
     }
     else
         res.redirect('/')
@@ -408,25 +408,25 @@ router.get('/disconnect' , (req,res,next) =>{
 router.get('/chat', (req, res, next) => {
     info = {}
     rooms = []
-    if(req.session.user) {
+    if (req.session.user) {
         user.get_groups(req.session.user.id, (resultGroup) => {
             info.groups = resultGroup
-            info['groups'].forEach(e => rooms.push(e.id.toString()) )
+            info['groups'].forEach(e => rooms.push(e.id.toString()))
             user.connections(req.session.user.id, (resultConn) => {
                 info.connections = resultConn
-                info.connections.forEach(e => rooms.push(req.session.user.id > e.id ? `${e.id}+${req.session.user.id}` : `${req.session.user.id}+${e.id}`))              
+                info.connections.forEach(e => rooms.push(req.session.user.id > e.id ? `${e.id}+${req.session.user.id}` : `${req.session.user.id}+${e.id}`))
                 msg = ''
-                rooms.forEach((e,i) => {
+                rooms.forEach((e, i) => {
                     msg += '(SELECT MAX(id) FROM messages WHERE room = ?)'
-                    if(i<rooms.length-1)
+                    if (i < rooms.length - 1)
                         msg += ','
-                })                
+                })
                 user.getRecentMsg(rooms, msg, (result) => {
                     res.render('chat_room', {
-                        title : 'Chat Room',
-                        user : req.session.user,
-                        info : info,
-                        messages : result 
+                        title: 'Chat Room',
+                        user: req.session.user,
+                        info: info,
+                        messages: result
                     })
                 })
             })
@@ -436,77 +436,77 @@ router.get('/chat', (req, res, next) => {
 })
 
 // request to post the group details into the database
-router.post('/create_group' , (req,res,next) => {
+router.post('/create_group', (req, res, next) => {
     members = req.body.members + req.session.user.id
-    
+
     user.create_group(req.body.name, members, (result) => res.send(result))
 
 })
 
 // request for getting the newly formed connections
-router.get('/get_conn_noti' , (req,res,next) => {
-    if(req.session.user) {
+router.get('/get_conn_noti', (req, res, next) => {
+    if (req.session.user) {
         user.new_conn(req.session.user.id, (result) => res.send(result))
     }
-    else    res.redirect('/')
+    else res.redirect('/')
 })
 
 // request to get the document page
-router.get('/docs' , (req,res,next) =>{
-    if(req.session.user){
-        user.getDocs(req.session.user.Email , (result) => {
+router.get('/docs', (req, res, next) => {
+    if (req.session.user) {
+        user.getDocs(req.session.user.Email, (result) => {
             let docs
-            docs = result.length ? result : 'No documents were made' 
-            res.render('document' , {
-                title : 'Documents',
-                user : req.session.user,
-                error : '',
-                docs : docs
+            docs = result.length ? result : 'No documents were made'
+            res.render('document', {
+                title: 'Documents',
+                user: req.session.user,
+                error: '',
+                docs: docs
             })
         })
     }
-    else    res.redirect('/')
+    else res.redirect('/')
 })
 
 
 // request to store the document details into the database
-router.post('/docs' , (req,res,next) => {
+router.post('/docs', (req, res, next) => {
     name = req.body.name.trim()
     des = req.body.des.trim()
     pwd = req.body.pwd.trim()
-    user.putDocs(name,req.session.user.Email,pwd,des, (result) => {
-        if(result) {
+    user.putDocs(name, req.session.user.Email, pwd, des, (result) => {
+        if (result) {
             p = result.insertId
             res.redirect(`/editor/${req.session.user.Email}/${p}`)
         }
         else {
-            res.render('document' , {
-                title : 'Documents',
-                user : req.session.user,
-                error : 'There was an error creating the document'
+            res.render('document', {
+                title: 'Documents',
+                user: req.session.user,
+                error: 'There was an error creating the document'
             })
         }
     })
 })
 
 // save the changes in the document
-router.post('/saveDoc' , (req,res,next) => {
+router.post('/saveDoc', (req, res, next) => {
     console.log(req.body)
     user.saveDoc(req.body.room, req.body.content, (result) => res.send(result))
 })
 
 // request to get the editor
-router.get(`/editor/:name/:id` , (req,res,next) => {
-    if(req.session.user) {
-        name = req.params.name
+router.get(`/editor/:name/:id`, (req, res, next) => {
+    if (req.session.user) {
+        name = req.params.name.split('-').join(' ')
         id = req.params.id
         user.findDoc(id, (result) => {
-            if(result.length){ 
-                if(result[0].Name == name) {
-                    res.render('editor' , {
-                        title : `${name} - Editor`,
-                        user : req.session.user,
-                        document : result
+            if (result.length) {
+                if (result[0].Name == name) {
+                    res.render('editor', {
+                        title: `${name} - Editor`,
+                        user: req.session.user,
+                        document: result
                     })
                 }
                 else res.send('document not found')
@@ -514,75 +514,83 @@ router.get(`/editor/:name/:id` , (req,res,next) => {
             else
                 res.send('document not found')
         })
-    }   
-    else    res.redirect('/')
+    }
+    else res.redirect('/')
+})
+
+// get content of the document
+router.get('/get/document/content', (req, res, next) => {
+    const id = parseInt(req.query.id)
+    user.getContent(id, result => {
+        res.send(result)
+    })
 })
 
 // request to fetch sign for the editor
-router.get('/fetch_sign' , (req,res,next) => {
-    if(req.session.user){
-        if(bcrypt.compareSync(req.query.pwd,req.session.user.Password))
+router.get('/fetch_sign', (req, res, next) => {
+    if (req.session.user) {
+        if (bcrypt.compareSync(req.query.pwd, req.session.user.Password))
             res.send(req.session.user.Sign)
-        else 
+        else
             res.send('Password is wrong')
-    }    
-    else    res.redirect('/')
+    }
+    else res.redirect('/')
 })
 
 // to get the id of the user logged in
-router.get('/getid', (req,res,next) => {
-    if(req.session.user) {
+router.get('/getid', (req, res, next) => {
+    if (req.session.user) {
         id = req.session.user.id.toString()
-        res.send({id : id, name : req.session.user.Name})
+        res.send({ id: id, name: req.session.user.Name })
     }
-    else    res.redirect('/')
-}) 
+    else res.redirect('/')
+})
 
 // to get all the users in a group
-router.get('/group_members' , (req,res,next) => {
-    if(req.session.user){
+router.get('/group_members', (req, res, next) => {
+    if (req.session.user) {
         id = req.query.id
-        user.getMembers(id, (result) => res.send(result) )       
+        user.getMembers(id, (result) => res.send(result))
     }
-    else    res.redirect('/')
+    else res.redirect('/')
 })
 
 // request for making the user admin of the group
-router.post('/make_admin', (req,res,next) => {
+router.post('/make_admin', (req, res, next) => {
     gid = req.body.gid
     mid = req.body.mid
-    user.makeAdmin(gid,mid, (result) => res.send(result))
+    user.makeAdmin(gid, mid, (result) => res.send(result))
 })
 
 // request for adding the members
-router.post('/add_members' , (req,res,next) => {
-    user.add_members(req.body , result => res.send(result)) 
+router.post('/add_members', (req, res, next) => {
+    user.add_members(req.body, result => res.send(result))
 })
 
 // post the sent message into the database
-router.post('/put_message', (req,res,next) => {
+router.post('/put_message', (req, res, next) => {
     input = {
-        room : req.body.room,
-        msg : req.body.msg,
-        sent : parseInt(req.body.sent),
-        type : req.body.type
+        room: req.body.room,
+        msg: req.body.msg,
+        sent: parseInt(req.body.sent),
+        type: req.body.type
     }
     user.put_message(input, (result) => console.log(result))
 })
 
 // get all the messages for a particular room
-router.get('/get_all_messages' , (req,res,next) => {
-    user.get_all_messages(req.query.id , (result) => res.send(result))
+router.get('/get_all_messages', (req, res, next) => {
+    user.get_all_messages(req.query.id, (result) => res.send(result))
 })
 
 // to get the bidirectional connections
-router.get('/bidirectional_connections' , (req,res,next) => {
+router.get('/bidirectional_connections', (req, res, next) => {
     user.bconnection(req.session.user.id, req.query.master, (result) => res.send(result))
 })
 
 // refresh the div to get the groups
-router.get('/refresh_groups' , (req,res,next) => {
-    if(req.session.user) {
+router.get('/refresh_groups', (req, res, next) => {
+    if (req.session.user) {
         user.get_groups(req.session.user.id, result => res.send(result))
     }
 })

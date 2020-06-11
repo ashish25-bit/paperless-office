@@ -15,7 +15,7 @@ block content
         if docs != 'No documents were made'
             -docs.forEach(element => {  
                 .doc
-                    a(class="doc_name" href=`/editor/${element.Name}/${element.id}` )= element.Name
+                    a(class="doc_name" href=`/editor/${element.Name.split(' ').join('-')}/${element.id}` )= element.Name
                     p(class="doc_des")= element.Description
                     p(class="doc_time") Created : 
                         span= element.Timestamp

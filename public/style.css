@@ -1060,3 +1060,104 @@ textarea{
     font-size: 20px;
     padding: 10px;
 }
+
+/* editor */
+
+
+.share_add_btn_con{
+    margin: 10px 0;
+    text-align: center;
+}
+
+.share_add_btn_con input{
+    margin: 0 5px;
+    padding: 5px 8px;
+    border: none;
+    color: white;
+    font-weight: 700;
+    background: #36827D;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+    outline: none;
+}
+
+.share_add_btn_con input:hover{
+    background: #20504d;
+}
+
+.doc_content{
+    margin: 0 auto;
+    width: 80%;
+    height: 80vh;
+    overflow-y: auto;
+    border: 1px #ddd solid;
+    padding: 20px;
+    position: relative;
+    word-break: break-word;
+}
+.doc_content::-webkit-scrollbar {
+    width: 5px;
+}
+.doc_content::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+}
+   
+  /* Handle */
+.doc_content::-webkit-scrollbar-thumb {
+    background: #888; 
+}
+  
+  /* Handle on hover */
+.doc_content:-webkit-scrollbar-thumb:hover {
+    background: #555; 
+}
+
+.pwd_con_sign{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0,0,0,.5);
+}
+.pwd_con_sign div{
+    position: absolute;
+    top:40%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 400px;
+    background: #235D42;
+    text-align: center;
+    padding: 20px;
+    border-radius: 60px;
+    box-shadow: 3px 3px 3px rgba(0,0,0,.4), -1px -1px 3px white;
+}
+.sign_pwd{
+    width: 80%;
+    margin: 10px 0;
+    padding: 6px;
+    border:1px #ccc solid;
+    border-radius: 50px;
+    outline: none;
+}
+
+.signed_img{
+    pointer-events: none;
+    width: 200px;
+}
+
+.cancel_sign,.fetch_sign{
+    margin: 10px 5px;
+    padding: 6px;
+    border-radius: 50px;
+    border: none;
+    color:white;
+    background: #179498;
+    outline: none;
+    letter-spacing: 1.4px;
+}
+
+.wrong_pwd{
+    text-align: center;
+    color: red;
+}

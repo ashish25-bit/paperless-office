@@ -1,36 +1,24 @@
-doctype html
-html(lang="en")
-    head
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-       title= title
-       <style>@import url('https://fonts.googleapis.com/css?family=Poppins&display=swap');</style>
-       style
-            include includes/style-route.css
-    body
-        .head
-            include includes/header
-            block content
+block content
+    include lay_head
+    .edit_con            
+        .share_add_btn_con
+            input(type="button", value="Save Document" class='save_content' title='Save your edited document.')
+            input(type="button", value="Add Signature" class="add_sign" title='Add Your Signature in the document.')
+            input(type="button", value="Share Document" class="share_doc" title='Share this document as an editable file to your collegues.' data-doc-id=document[0].id)
+            input(type="button", value="Save as pdf" class="save_pdf" title='Save your document as a document.')
+            if user.Email == document[0].Email
+                input(type="button", value="Edit Doc Details" class="edit_dd" title='Change/Add document description, Change document password.')
 
-        <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+        div(contenteditable="true" class="doc_content")
 
-        .edit_con            
-            .share_add_btn_con
-                input(type="button", value="Save Document" class='save_content' title='Save your edited document.')
-                input(type="button", value="Add Signature" class="add_sign" title='Add Your Signature in the document.')
-                input(type="button", value="Share Document" class="share_doc" title='Share this document as an editable file to your collegues.' data-doc-id=document[0].id)
-                input(type="button", value="Save as pdf" class="save_pdf" title='Save your document as a document.')
-                if(user.Email == document[0].Email)
-                    input(type="button", value="Edit Doc Details" class="edit_dd" title='Change/Add document description, Change document password.')
+    .pwd_con_sign
+        div
+            input(class="sign_pwd" type='password' placeholder="Enter your password.." value='1234')
+            p.wrong_pwd
+            input(type="button", value="Fetch Signature" class="fetch_sign")
+            input(type="button", value="Cancel" class="cancel_sign")
 
-            div(contenteditable="true" class="doc_content")= document[0].Content
-            
-        .pwd_con_sign
-            div
-                input(class="sign_pwd" type='password' placeholder="Enter your password.." value='1234')
-                p.wrong_pwd
-                input(type="button", value="Fetch Signature" class="fetch_sign")
-                input(type="button", value="Cancel" class="cancel_sign")
-                
-        script(src="/socket.io/socket.io.js")
-        script
-            include includes/editor.js
+
+    script(src="/socket.io/socket.io.js")
+    script
+        include includes/editor.js

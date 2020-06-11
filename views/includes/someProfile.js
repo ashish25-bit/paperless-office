@@ -1,17 +1,12 @@
 let id
 let connect_status
 const connect_btn = document.querySelector('.connect_btn')
-{
-    id_profile = document.querySelector('.profile_id')
-    index = id_profile.innerHTML.indexOf("=")
-    id = parseInt(id_profile.innerHTML.substring(index + 1))
-}
 
 getConnection()
 
 function getConnection() {
     id_profile = document.querySelector('.profile_id')
-    index = id_profile.innerHTML.indexOf("=")
+    index = id_profile.innerHTML.lastIndexOf("/")
     id = parseInt(id_profile.innerHTML.substring(index + 1))
     ids = {master : id}
 
@@ -30,7 +25,6 @@ function getConnection() {
 }
 
 $('.connect_btn').on('click' , () => {
-
     if(!connect_status) {
         ids = {master : id}
         

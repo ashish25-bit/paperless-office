@@ -302,9 +302,17 @@ User.prototype = {
 
     // find the document the user has requested for
     findDoc: (id, callback) => {
-        let query = 'SELECT * FROM documents WHERE id = ?'
+        let query = 'SELECT id, Name, Email FROM documents WHERE id = ?'
         db.query(query,id,(err,result) => {
             if(err) throw err
+            callback(result)
+        })
+    },
+
+    getContent: (id, callback) => {
+        let query = 'SELECT Content FROM documents WHERE id = ?'
+        db.query(query, id, (err, result) => {
+            if (err) throw err
             callback(result)
         })
     },

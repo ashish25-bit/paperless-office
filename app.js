@@ -5,9 +5,7 @@ const pageRouter = require('./routes/pages')
 const socketio = require('socket.io') 
 const http = require('http')
 const {joinUser,removeUser,findUser,showRoom,userJoin,findUserAll,joinDoc} = require('./utils/users')
-const User = require('./core/user') 
 
-const uu = new User()
 const app = express()
 const server = http.createServer(app)
 const io = socketio(server)
@@ -16,6 +14,8 @@ const io = socketio(server)
 app.use(express.urlencoded({ extended : false }))
 //server static files
 app.use(express.static(path.join(__dirname, 'public')))
+app.use('/profile', express.static('public'))
+app.use('/editor/:name', express.static('public'))
 
 //set template engine 
 app.set('views' , path.join(__dirname, 'views'))
