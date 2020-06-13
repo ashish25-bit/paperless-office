@@ -491,7 +491,6 @@ router.post('/docs', (req, res, next) => {
 
 // save the changes in the document
 router.post('/saveDoc', (req, res, next) => {
-    console.log(req.body)
     user.saveDoc(req.body.room, req.body.content, (result) => res.send(result))
 })
 
@@ -609,10 +608,12 @@ router.get('/getusers', (req, res, next) => {
 
 // put the send document msg into the database
 router.post('/d_message', (req, res, next) => {
-    const { entry, questionsMarks } = req.body
-    console.log(entry)
-    console.log(questionsMarks)
-    res.send('tis working')
+    const info = req.body['info[]']
+    const questionsMarks = req.body.questionsMarks
+    user.put_doc_msg(info, questionsMarks, result => {
+        // console.log(result)
+        res.send(result)
+    })
 })
 
 module.exports = router

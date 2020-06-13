@@ -1,7 +1,7 @@
-const add_sign = document.querySelector('.add_sign')
+const add_sign = document.querySelector('.add_sign') 
 const pwd_con = document.querySelector('.pwd_con_sign')
 const pwd = document.querySelector('.sign_pwd')
-const content = document.querySelector('.doc_content')
+const content = document.querySelector('.doc_content') 
 const share = document.querySelector('.share_doc')
 const edit = document.querySelector('.edit_dd')
 const save = document.querySelector('.save_content')
@@ -13,13 +13,15 @@ const cancel = document.querySelector('.cancel')
 const send = document.querySelector('.send')
 const chats = document.querySelector('.share_chats_con')
 const loggedId = parseInt(document.querySelector('.profile_photo').getAttribute('data-profile'))
-let selected_chats = []
-let room
+const response_msg = document.querySelector('.response_msg')
+let selected_chats = [] // the chats for selected for sending the document link
+let room // the room of the editor
 const socket = io()
 
 {
     pwd_con.style.display = 'none'
     chats.style.display = 'none'
+    // getting the room id of the editor
     room = share.getAttribute('data-doc-id')
     socket.emit('joinDocRoom', room)
     $.ajax({
@@ -32,15 +34,17 @@ const socket = io()
     })
 }
 
+// password modal will be pooped up 
 add_sign.addEventListener('click', () => pwd_con.style.display = 'block')
+
+// validating the password for signature
 document.querySelector('.cancel_sign').addEventListener('click', () => {
     pwd_con.style.display = 'none'
     $('.wrong_pwd').html('')
 })
 
-save.addEventListener('click', saveDoc)
-
-function saveDoc() {
+// saving the document
+save.addEventListener('click', () => {
     det = {
         room: room,
         content: content.innerHTML
@@ -50,11 +54,12 @@ function saveDoc() {
         method: 'POST',
         data: det,
         success: (response) => {
-            console.log(response)
+            responseFunction(response)
         }
     })
-}
+})
 
+// fetching the signature and appending it to the document
 document.querySelector('.fetch_sign').addEventListener('click', () => {
     if (pwd.value == '')
         alert('Enter Password...')
@@ -87,6 +92,7 @@ if (edit !== null) {
     })
 }
 
+// sending the content to other poeple joined in the editor socket
 content.addEventListener('keyup', event => {
     if (event.key == 'Escape') {
         event.preventDefault()
@@ -96,10 +102,10 @@ content.addEventListener('keyup', event => {
         socket.emit('docContent', content.innerHTML)
 })
 
-// get the message 
+// get the content of the document and display it on the input element
 socket.on('message', msg => content.innerHTML = msg)
 
-// share the document
+// a modal will appear which will contain the groups and connections
 share.addEventListener('click', () => {
     selected_chats = []
     chats.style.display = 'flex'
@@ -115,12 +121,12 @@ share.addEventListener('click', () => {
 
             if (connection.length)
                 connection.forEach(person => makeNode(person, 'people'))
-            else 
+            else
                 peopleCon.innerText = 'No Connections'
 
             if (groups.length)
                 groups.forEach(group => makeNode(group, 'groups'))
-            else 
+            else
                 groupCon.innerText = 'No Groups'
         }
     })
@@ -138,12 +144,17 @@ peopleBtn.addEventListener('click', () => {
     groupCon.style.display = 'none'
 })
 
+// cancel sharing the document
 cancel.addEventListener('click', () => chats.style.display = 'none')
 
+// send the document to the selected people
 send.addEventListener('click', () => {
     cancel.disabled = true
-    // let questionsMarks = ''
-    // let info = []
+    send.disabled = true
+    send.classList.add('disabled')
+    cancel.classList.add('disabled')
+    let questionsMarks = ''
+    let info = []
     selected_chats.forEach(chat => {
         if (chat.includes('+'))
             socket.emit('sendmsg', { msg: 'Hello Friend From the editor', room: chat, type: 'document' })
@@ -151,42 +162,57 @@ send.addEventListener('click', () => {
             socket.emit('sendGroupmsg', { msg: 'Hello Group From the editor', name: username_logged, room: chat, type: 'document' })
     })
 
-    // selected_chats = ['4+9', '2']
-    // // room, message, sent, date, time, type
-    // let date = 'June 12, 2020'
-    // let time = '11:43 PM' 
-    // selected_chats.forEach((chat, index) => {
-    //     questionsMarks += '(?, ?, ?, ?, ?, ?)'
-    //     if(index < selected_chats.length -1) 
-    //         questionsMarks += ', '
-    //     info.push(chat)
-    //     info.push('From Editor')
-    //     info.push(loggedId)
-    //     info.push(date)
-    //     info.push(time)
-    //     info.push('text')
-    // })
+    // room, message, sent, date, time, type
+    let date = 'June 12, 2020'
+    let time = '11:43 PM'
+    selected_chats.forEach((chat, index) => {
+        questionsMarks += '(?, ?, ?, ?, ?, ?)'
+        if (index < selected_chats.length - 1)
+            questionsMarks += ', '
+        info.push(chat)
+        info.push('From Editor')
+        info.push(loggedId)
+        info.push(date)
+        info.push(time)
+        info.push('text')
+    })
 
-    // console.log('object')
-
-    // $.ajax({
-    //     url: '/d_message',
-    //     method: 'POST',
-    //     data: {
-    //         info,
-    //         questionsMarks
-    //     },
-    //     success: response => {}
-    // })
+    $.ajax({
+        url: '/d_message',
+        method: 'POST',
+        data: {
+            info,
+            questionsMarks
+        },
+        success: response => {
+            cancel.disabled = false
+            send.disabled = false
+            send.classList.remove('disabled')
+            cancel.classList.remove('disabled')
+            chats.style.display = 'none'
+            responseFunction(response)
+        }
+    })
 
 })
 
+// display the response on some ajax calls
+function responseFunction(msg) {
+    response_msg.innerText = msg
+    response_msg.classList.add('response_msg_active')
+    setTimeout(() => {
+        response_msg.innerText = ''
+        response_msg.classList.remove('response_msg_active')
+    }, 5000)
+}
+
+// making the nodes for the available chat connections and groups
 function makeNode(details, type) {
     const { id, Name } = details
 
-    let room = type !== 'people' 
-                ? id :
-                loggedId > id ? `${id}+${loggedId}` : `${loggedId}+${id}`
+    let room = type !== 'people'
+        ? id :
+        loggedId > id ? `${id}+${loggedId}` : `${loggedId}+${id}`
 
     let div = document.createElement('div')
     let checkbox = document.createElement("input");
@@ -201,16 +227,17 @@ function makeNode(details, type) {
     type === 'people' ? peopleCon.appendChild(div) : groupCon.appendChild(div)
 }
 
+// add the people who you want to send the document
 function selectChats(e) {
     const id = e.target.getAttribute('id')
-    if(selected_chats.includes(id)) {
+    if (selected_chats.includes(id)) {
         let index = selected_chats.indexOf(id)
-        selected_chats.splice(index,1)
+        selected_chats.splice(index, 1)
     }
-    else 
+    else
         selected_chats.push(id)
 
-    if(selected_chats.length) {
+    if (selected_chats.length) {
         send.classList.remove('disabled')
         send.disabled = false
     }

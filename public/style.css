@@ -74,6 +74,30 @@ button, input, textarea {
     margin: 0 9px;
 }
 
+.response_msg {
+    position: fixed;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    user-select: none;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    letter-spacing: 1.5px;
+}
+
+.response_msg_active {
+    padding: 10px;
+    animation: response 0.3s ease forwards;
+    opacity: 0;
+}
+
+@keyframes response {
+    to {
+        opacity: 1;
+    }
+}
+
 /* commom for many pages */
 .logout_con{
     text-align: right;
