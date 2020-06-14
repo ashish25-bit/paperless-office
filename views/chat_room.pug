@@ -15,13 +15,14 @@ block content
                 .message
                     if(messages.length)
                         -messages.forEach(message => {
+                            //- for personal chats
                             if(message.room.includes('+'))
                                 -var index = info.connections.findIndex(conn => (conn.id>user.id?`${user.id}+${conn.id}`:`${conn.id}+${user.id}`) == message.room)
                                 if(index>=0)
                                     div(class='msg_recent_con' personal data-connection-id=info.connections[index].id data-room=message.room)
                                         p(class='msg_recent_name')= info.connections[index].Name
                                         p(class='msg_recent_date')= message.Date
-                                        div(class='msg_recent_msg')= message.message
+                                        div(class='msg_recent_msg')= message.type !== 'text' ? 'Document/File' : message.message
                                         p(class='msg_recent_time')= message.Time
                                     
                             else 
@@ -30,7 +31,7 @@ block content
                                     div(class='msg_recent_con' group data-group-id=info.groups[index].id data-room=message.room)
                                         p(class='msg_recent_name')= info.groups[index].Name
                                         p(class='msg_recent_date')= message.Date
-                                        div(class='msg_recent_msg')= message.message
+                                        div(class='msg_recent_msg')= message.type !== 'text' ? 'Document/File' : message.message
                                         p(class='msg_recent_time')= message.Time
                         -})
                     else 

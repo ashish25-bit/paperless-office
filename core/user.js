@@ -401,7 +401,7 @@ User.prototype = {
 
     // get the messages 
     getRecentMsg: (room, msg, callback) => {
-        let query = `SELECT id,message,Time,Date,room FROM messages WHERE id IN (${msg}) ORDER BY id DESC`
+        let query = `SELECT id,message,Time,Date,room,type FROM messages WHERE id IN (${msg}) ORDER BY id DESC`
         db.query(query, room, (err, res) => {
             if (err) throw err
             callback(res)
@@ -410,7 +410,7 @@ User.prototype = {
 
     // get all the messages for a particular user
     get_all_messages: (id, callback) => {
-        let query = `SELECT users.Name, messages.message, messages.Time, messages.sent FROM users 
+        let query = `SELECT users.Name, messages.message, messages.Time, messages.sent, messages.type FROM users 
                      INNER JOIN messages ON users.id=messages.sent 
                      WHERE messages.room = ? 
                      ORDER BY messages.id ASC`

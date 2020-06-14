@@ -30,6 +30,7 @@ app.use(session({
 
 // to get the login page
 app.use('/', pageRouter)
+app.use('/api', require('./routes/api'))
 
 //errors
 app.use((req, res, next) => {

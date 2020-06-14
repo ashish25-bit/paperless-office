@@ -1,4 +1,4 @@
-connect_status = []
+let connect_status = []
 
 {
     // to get the notification of the connections
@@ -7,7 +7,7 @@ connect_status = []
     // to get the people you may know
     id = []
     $.ajax({
-        url : '/people_you_may_know',
+        url : '/api/people_you_may_know',
         method : 'GET',
         success : (response) => {
             p = '<p style="text-align:center;background:white;padding:5px 0;">People you may know</p>'
@@ -31,7 +31,7 @@ connect_status = []
             connect_btn = document.querySelectorAll('.connect_btn')
 
             $.ajax({
-                url : '/get_connections/' + id_logged_user,
+                url : `/api/get_connections/${id_logged_user}`,
                 method : 'GET',
                 success : (response) => {
                     response.forEach(element => {
@@ -50,11 +50,10 @@ connect_status = []
 
                     if(!connect_status[index]){
                         $.ajax({
-                            url : '/connect',
+                            url : '/api/connect',
                             method : 'POST',
                             data : ids,
                             success : (response) => {
-                                console.log(response)
                                 connect_btn[index].innerHTML = 'Connected'
                                 connect_btn[index].classList.add('connected')
                             }
@@ -63,11 +62,10 @@ connect_status = []
 
                     else{
                         $.ajax({
-                            url : '/disconnect',
+                            url : '/api/disconnect',
                             method : 'GET',
                             data : ids,
                             success : (response) => {
-                                console.log(response)
                                 connect_btn[index].innerHTML = 'Connect'
                                 connect_btn[index].classList.remove('connected')
                             }
@@ -88,12 +86,11 @@ connect_status = []
     })
 }
 
-
 function getconn() {
     res = ''
     conid = []
     $.ajax({
-        url : '/get_conn_noti',
+        url : '/api/get_conn_noti',
         method : 'GET',
         success : (response) => {
             if(response.length) {
@@ -112,5 +109,3 @@ function getconn() {
         }
     })
 }
-
-setInterval(() => getconn(), 2000)

@@ -17,6 +17,7 @@ const response_msg = document.querySelector('.response_msg')
 let selected_chats = [] // the chats for selected for sending the document link
 let room // the room of the editor
 const socket = io()
+const NowMoment = moment();
 
 {
     pwd_con.style.display = 'none'
@@ -157,24 +158,25 @@ send.addEventListener('click', () => {
     let info = []
     selected_chats.forEach(chat => {
         if (chat.includes('+'))
-            socket.emit('sendmsg', { msg: 'Hello Friend From the editor', room: chat, type: 'document' })
+            socket.emit('sendmsg', { msg: window.location.href, room: chat, type: 'document' })
         else
-            socket.emit('sendGroupmsg', { msg: 'Hello Group From the editor', name: username_logged, room: chat, type: 'document' })
+            socket.emit('sendGroupmsg', { msg: window.location.href, name: username_logged, room: chat, type: 'document' })
     })
 
     // room, message, sent, date, time, type
-    let date = 'June 12, 2020'
-    let time = '11:43 PM'
+    let date = NowMoment.format('LL')
+    let time = NowMoment.format('LT')
+
     selected_chats.forEach((chat, index) => {
         questionsMarks += '(?, ?, ?, ?, ?, ?)'
         if (index < selected_chats.length - 1)
             questionsMarks += ', '
         info.push(chat)
-        info.push('From Editor')
+        info.push(window.location.href)
         info.push(loggedId)
         info.push(date)
         info.push(time)
-        info.push('text')
+        info.push('document')
     })
 
     $.ajax({

@@ -18,16 +18,16 @@ let company
 
 {
     display_none()
-    update[0].style.display = 'block'        
+    update[0].style.display = 'block'
     get_details()
 }
 
-window.onerror = function() {
-	console.log(arguments)
+window.onerror = function () {
+    console.log(arguments)
 }
 
-option_update.forEach((element,index) => {
-    element.addEventListener('click' , () => {
+option_update.forEach((element, index) => {
+    element.addEventListener('click', () => {
         $('.det_update_msg').html('')
         $('.pwd_update_msg').html('')
         update[previousIndex].style.display = 'none'
@@ -39,63 +39,63 @@ option_update.forEach((element,index) => {
 })
 
 
-function display_none(){
-    for(i=0;i<update.length;i++)
+function display_none() {
+    for (i = 0; i < update.length; i++)
         update[i].style.display = 'none'
 }
 
-input.onkeyup = function(e) {
+input.onkeyup = function (e) {
     lastKeyUp = e.timeStamp
-	if (e.timeStamp - lastKeyUp > delay) 
-		doSearch()
-	else 
-		cb = setTimeout(doSearch, delay)
+    if (e.timeStamp - lastKeyUp > delay)
+        doSearch()
+    else
+        cb = setTimeout(doSearch, delay)
 }
 
 function doSearch() {
-	ajax.open("GET", "https://autocomplete.clearbit.com/v1/companies/suggest?query=:" + input.value.trim(), true);
-		ajax.onload = function() {
-			var ans = ''
-			JSON.parse(ajax.responseText).map(function(i) {
-				ans += '<div class="company"><div class="company_logo">'
-				if (!i.logo) {
-					i.logo = 'http://dummyimage.com/128x128?text=No%20Logo'
-				};
-				ans += '<img src="' + i.logo + '"/>'
-				ans += '</div>'
-				ans += '<div class="company_name">'
-				ans += '<p>' + ((i.name) ? i.name : i.domain) + '</p>'
-				ans += '</div></div>'
-			})
-			result.innerHTML = ans
-			company = document.querySelectorAll('.company')
+    ajax.open("GET", "https://autocomplete.clearbit.com/v1/companies/suggest?query=:" + input.value.trim(), true);
+    ajax.onload = function () {
+        var ans = ''
+        JSON.parse(ajax.responseText).map(function (i) {
+            ans += '<div class="company"><div class="company_logo">'
+            if (!i.logo) {
+                i.logo = 'http://dummyimage.com/128x128?text=No%20Logo'
+            };
+            ans += '<img src="' + i.logo + '"/>'
+            ans += '</div>'
+            ans += '<div class="company_name">'
+            ans += '<p>' + ((i.name) ? i.name : i.domain) + '</p>'
+            ans += '</div></div>'
+        })
+        result.innerHTML = ans
+        company = document.querySelectorAll('.company')
 
-			company.forEach((element,index) => {
-				element.addEventListener('click' , () => {
-					input.value = document.querySelectorAll('.company_name p')[index].innerHTML
-					result.innerHTML = ''
-				})
-			})
+        company.forEach((element, index) => {
+            element.addEventListener('click', () => {
+                input.value = document.querySelectorAll('.company_name p')[index].innerHTML
+                result.innerHTML = ''
+            })
+        })
 
-		}
-		ajax.send()
+    }
+    ajax.send()
 }
 
 // update the details
-$('.update_det').on('click' , () => {
-    if(comp.value == '' || pos.value == '')
+$('.update_det').on('click', () => {
+    if (comp.value == '' || pos.value == '')
         alert('Enter All Fields')
-    else{
+    else {
         det = {
-            name : name.value,
-            company : input.value,
-            position : pos.value
+            name: name.value,
+            company: input.value,
+            position: pos.value
         }
         $.ajax({
-            url : '/update_details',
-            method : 'POST',
+            url: '/update_details',
+            method: 'POST',
             data: det,
-            success : (response) => {
+            success: (response) => {
                 $('.det_update_msg').html(response)
             }
         })
@@ -103,25 +103,25 @@ $('.update_det').on('click' , () => {
 })
 
 //password update 
-$('.update_pwd_btn').on('click' ,() => {
-    if(old_pwd.value== '' || new_pwd.value == '' || con_new_pwd.value == '')
+$('.update_pwd_btn').on('click', e => {
+    e.preventDefault()
+    if (old_pwd.value == '' || new_pwd.value == '' || con_new_pwd.value == '')
         alert('Enter all fields')
-    else{
-        if(new_pwd.value == con_new_pwd.value){
+    else {
+        if (new_pwd.value == con_new_pwd.value) {
             pass = {
-                old : old_pwd.value,
-                pwd : new_pwd.value
+                old: old_pwd.value,
+                pwd: new_pwd.value
             }
             $.ajax({
-                url : '/update_pwd',
-                method : 'POST',
-                data : pass,
-                success : (response) => {
+                url: '/api/update_pwd',
+                method: 'POST',
+                data: pass,
+                success: (response) => {
                     $('.pwd_update_msg').html(response)
                     old_pwd.value = ''
                     new_pwd.value = ''
                     con_new_pwd.value = ''
-                    get_details()
                 }
             })
         }
@@ -131,16 +131,16 @@ $('.update_pwd_btn').on('click' ,() => {
 })
 
 //get request 
-function get_details(){
+function get_details() {
     $.ajax({
-        url : '/get_details',
-        method : 'GET',
-        success : (response) => {
+        url: '/api/get_details',
+        method: 'GET',
+        success: (response) => {
             comp.value = response[0]['Company']
             pos.value = response[0]['Position']
-            if(response[0]['DP'] == null)
+            if (response[0]['DP'] == null)
                 img.src = 'uploads/download.png'
-            else 
+            else
                 img.src = 'uploads/' + response[0]['DP']
         }
     })

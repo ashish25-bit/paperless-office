@@ -864,6 +864,19 @@ button, input, textarea {
     font-size: 12px;
     color: #603939;
 }
+.ques .document_link_chat, .ans .document_link_chat {
+    display: inline-block;
+    width: 200px;
+    text-align: center;
+    background: #58dc98;   
+    border-radius: 20px 0 20px 20px;
+    padding: 20px 0;
+    font-size: 20px;
+}
+.ans .document_link_chat {
+    background: #42bd7d;   
+    border-radius: 0 20px 20px 20px;
+}
 .group_chat_header{
     z-index: 100;
     position: relative;
@@ -936,6 +949,7 @@ button, input, textarea {
     padding-bottom: 5px;
 }
 .add_mem_con{
+    display: none;
     margin-top: 5px;
 }
 .show_docs,.show_media,.show_members,.add_mem_btn,.make_admin_btn{
@@ -1041,13 +1055,13 @@ button, input, textarea {
 .nameDoc,.docPass,.docDes,.gotodocpass{
     width: 85%;
     margin: 10px 0;
-    padding: 6px;
+    padding: 6px 15px;
     border:1px #ccc solid;
     border-radius: 50px;
     outline: none;
 }
 .docDes{
-    padding: 10px 6px;
+    padding: 10px 15px;
     border-radius: 10px;
     height: 200px;
 }
@@ -1146,6 +1160,7 @@ button, input, textarea {
     width: 100%;
     height: 100vh;
     background: rgba(0,0,0,.5);
+    display: none;
 }
 .pwd_con_sign div{
     position: absolute;

@@ -57,7 +57,7 @@ const socket = io()
         chats.forEach(e => {
             id = parseInt(e.getAttribute('data-connection-id'))
             $.ajax({
-                url: '/bidirectional_connections',
+                url: '/api/bidirectional_connections',
                 method: 'GET',
                 data: { master: id },
                 success: (response) => {
@@ -190,11 +190,11 @@ function messaging(room, type) {
         if (i.value != '') {
             if (type == 'personal') {
                 socket.emit('sendmsg', { msg: i.value, room: room, type: 'text' })
-                appendMsg(i.value, 'ques', type, '')
+                appendMsg(i.value, 'ques', type, '', 'text', '')
             }
             if (type == 'group') {
                 socket.emit('sendGroupmsg', { msg: i.value, room: room, name: loggedName, type: 'text' })
-                appendMsg(i.value, 'ques', type, 'You')
+                appendMsg(i.value, 'ques', type, 'You', 'text', '')
             }
             messageToDatabase(room, i.value, loggedIn, 'text')
             updateRecent(i.value, room, type)
@@ -208,11 +208,11 @@ function messaging(room, type) {
                 console.log(i.value)
                 if (type == 'personal') {
                     socket.emit('sendmsg', { msg: i.value, room: room, type: 'text' })
-                    appendMsg(i.value, 'ques', type, '')
+                    appendMsg(i.value, 'ques', type, '', 'text', '')
                 }
                 if (type == 'group') {
                     socket.emit('sendGroupmsg', { msg: i.value, room: room, name: loggedName, type: 'text' })
-                    appendMsg(i.value, 'ques', type, 'You')
+                    appendMsg(i.value, 'ques', type, 'You', 'text', '')
                 }
                 messageToDatabase(room, i.value, loggedIn, 'text')
                 updateRecent(i.value, room, type)
@@ -226,7 +226,7 @@ function messageToDatabase(room, msg, sent, type) {
     msg = msg.trim()
     info = { room, msg, sent, type }
     $.ajax({
-        url: '/put_message',
+        url: '/api/put_message',
         method: 'POST',
         data: info,
         success: response => { return }
@@ -248,7 +248,7 @@ $('.show_media').on('click', () => {
 function getGroupMembers(id) {
     id = parseInt(id)
     $.ajax({
-        url: '/group_members',
+        url: '/api/group_members',
         method: 'GET',
         data: { id: id },
         success: response => {
@@ -291,7 +291,7 @@ function getGroupMembers(id) {
                         parent = element.parentElement
                         span = document.createElement('span')
                         $.ajax({
-                            url: '/make_admin',
+                            url: '/api/make_admin',
                             method: 'POST',
                             data: info,
                             success: response => {
@@ -359,7 +359,7 @@ document.querySelector('.add_members').addEventListener('click', () => {
             members: selected_ids.toString()
         }
         $.ajax({
-            url: '/add_members',
+            url: '/api/add_members',
             method: 'POST',
             data: info,
             success: response => console.log(response)
@@ -437,7 +437,7 @@ function create_group() {
         }
 
         $.ajax({
-            url: '/create_group',
+            url: '/api/create_group',
             method: 'POST',
             data: info,
             success: response => {
@@ -457,7 +457,7 @@ function create_group() {
 
 function refreshGroups() {
     $.ajax({
-        url: '/refresh_groups',
+        url: '/api/refresh_groups',
         method: 'GET',
         success: response => {
             r = ''
@@ -494,7 +494,7 @@ function insertInputBox(name, type) {
 // to get the message for specific connection or group
 function getChatMessages(room, type) {
     $.ajax({
-        url: '/get_all_messages',
+        url: '/api/get_all_messages',
         method: 'GET',
         data: { id: room },
         success: (response) => appendMsg2(response, type)
@@ -509,14 +509,26 @@ function groupInfoView() {
 }
 
 // appending the message to the chat message container
-function appendMsg(msg, cls, type, name) {
-    time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: 'false' })
+function appendMsg(msg, cls, type, name, msgType, time) {
+    if (time === '')
+        time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: 'false' })
     let div = document.createElement('div')
     div.classList.add(cls)
-    m = ''
+    let m = ''
+    // if the type of chat open is group then name of the person will be displayed
     if (type == 'group')
         m += `<p class="msg_name ${cls}_n">${name}</p><br/>`
-    m += `<p class="cm">${msg}</p><br/><p class="ct">${time}</p>`
+
+    // if the type of message is document then it should be a link
+    if (msgType === 'document') {
+        let doc_name = msg.split('/')
+        m += `<a class='document_link_chat' target='_blank' href="${msg}">${doc_name[doc_name.length - 2]}</a>`
+    }
+    else
+        m += `<p class="cm">${msg}</p>`
+
+    m += `<br/><p class="ct">${time}</p>`
+
     div.innerHTML = m
     let msg_con = document.querySelector(".chat_message")
     msg_con.appendChild(div)
@@ -529,31 +541,24 @@ function appendMsg2(messages, type) {
         let div = document.createElement('div')
         cls = item.sent == loggedIn ? 'ques' : 'ans'
         div.classList.add(cls)
-        m = ''
-        if (type == 'group')
-            m = `<p class="msg_name ${cls}_n">${item.Name}</p><br/>`
-        m += `<p class="cm">${item.message}</p><br/><p class="ct">${item.Time}</p>`
-        div.innerHTML = m
-        let msg_con = document.querySelector(".chat_message")
-        msg_con.appendChild(div)
-        msg_con.scrollTop = msg_con.scrollHeight
+        appendMsg(item.message, cls, type, item.Name, item.type, item.Time)
     })
 }
 
 // updating the recent message container
 function updateRecent(msg, room, attribute) {
-    i = document.querySelector('.msg_input')
+    let i = document.querySelector('.msg_input')
     if (i != null) {
         i.value = ''
         i.focus()
     }
-    d = new Date()
-    date = `${month[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`
-    time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: 'false' })
+    let d = new Date()
+    let date = `${month[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`
+    let time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: 'false' })
     let ii
     for (i = 0; i < recent_msg.length; i++) {
         if (recent_msg[i].hasAttribute(attribute)) {
-            r = recent_msg[i].getAttribute('data-room')
+            let r = recent_msg[i].getAttribute('data-room')
             if (r == room) {
                 ii = i
                 break
@@ -563,7 +568,7 @@ function updateRecent(msg, room, attribute) {
     recent_msg[ii].querySelector('.msg_recent_date').innerText = date
     recent_msg[ii].querySelector('.msg_recent_msg').innerText = msg
     recent_msg[ii].querySelector('.msg_recent_time').innerText = time
-    node = msg_con.removeChild(recent_msg[ii])
+    let node = msg_con.removeChild(recent_msg[ii])
     msg_con.insertAdjacentElement("afterbegin", node)
 }
 
@@ -585,7 +590,7 @@ function display_none() {
 // get notified when you are added to the group
 socket.on('group', info => {
     $.ajax({
-        url: '/refresh_groups',
+        url: '/api/refresh_groups',
         method: 'GET',
         success: response => {
             r = ''
@@ -606,13 +611,15 @@ socket.on('group', info => {
 // get the message for personal chat
 socket.on('message', info => {
     if (info.room == currentChatRoom)
-        appendMsg(info.msg, 'ans', 'personal', '')
+        appendMsg(info.msg, 'ans', 'personal', '', info.type, '')
+    // message, class name i.e 'ques' or 'ans', 'group' or 'personal' message, from, text message or a document link, time
     updateRecent(info.msg, info.room, 'personal')
 })
 
 // get the message for the group chat
 socket.on('messageGroup', info => {
     if (info.room == currentChatRoom)
-        appendMsg(info.msg, 'ans', 'group', info.from)
+        appendMsg(info.msg, 'ans', 'group', info.from, info.type, '')
+    // message, class name i.e 'ques' or 'ans', 'group' or 'personal' message, from, text message or a document link, time
     updateRecent(info.msg, info.room, 'group')
 })

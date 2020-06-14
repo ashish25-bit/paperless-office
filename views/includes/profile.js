@@ -7,7 +7,7 @@ const profile_pic_display = document.querySelector('.profile_pic_display')
 function get_details(){
 
         $.ajax({
-                url : '/get_details',
+                url : '/api/get_details',
                 method : 'GET',
                 success : (response) => {
                 if(response[0]['DP'] == null)

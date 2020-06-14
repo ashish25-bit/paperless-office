@@ -19,12 +19,12 @@ block content
 
         .update_option_con
 
-            // Container for Updating profile photo
+            //- Container for Updating profile photo
             .update_profile_photo_con.update
                 img(width='200px')
 
-            // Container for Updating password
-            .update_password_con.update
+            //- Container for Updating password
+            form(class='update_password_con update')
                 div 
                     input(type="password" class="update_pwd" placeholder="Enter Current Password")
                 div
@@ -34,7 +34,7 @@ block content
                 input(type="button", value="Confirm" class="upload update_pwd_btn")
                 p(class="pwd_update_msg")
 
-            // Container for Updating details
+            //- Container for Updating details
             .update_details_con.update
                 div
                     input(type="text" class="comp key" name="comp" placeholder='Enter the company you currently work in')
@@ -44,12 +44,10 @@ block content
                 p(class="det_update_msg")
             .companies_update
 
-            // Container for Updating Signature
+            //- Container for Updating Signature
             .update_signature_con.update
                 div(style="text-align:center;")
                     img(src='signature/' + user.Sign width='250px' style="pointer-events:none;")
 
     script
-        include includes/update_profile.js
-
-        
+        include includes/update_profile.js    
